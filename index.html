@@ -1,215 +1,295 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
+<html lang="ko" style="width: 1280px;"> <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ONZSOAP - Mobile</title>
+    <meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=0.1, user-scalable=yes">
+    <title>ONZSOAP - Client Detail</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght @400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght @400;600;700;900&display=swap');
+        
+        /* 모바일 브라우저의 자동 폰트 크기 조절 방지 */
+        html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+
         body { 
             font-family: 'Pretendard', sans-serif; 
             letter-spacing: -0.02em; 
-            background-color: #F8F9FA;
-            -webkit-tap-highlight-color: transparent;
+            width: 1280px; /* 1. 바디 너비 고정 */
+            min-width: 1280px;
+            margin: 0 auto;
+            overflow-x: auto;
+            background: #F8F9FA;
         }
-        /* 터치 시 스크롤 방지 및 인터페이스 최적화 */
-        #body-chart-container { touch-action: none; }
-        input, textarea, select { font-size: 16px !important; } /* iOS 줌 방지 */
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .tab-line { transition: all 0.3s ease; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .tab-line { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
         @keyframes pulse-red {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
-        .animate-pulse-red { animation: pulse-red 1.2s infinite; }
+        .animate-pulse-red { animation: pulse-red 1.5s infinite; }
     </style>
 </head>
-<body class="safe-area-inset">
+<body class="bg-[#F8F9FA]">
 
-    <div class="flex flex-col min-h-screen">
-        <header class="bg-white border-b border-gray-100 px-5 py-4 flex justify-between items-center sticky top-0 z-50">
-            <div class="text-[#3B82F6] font-black text-xl tracking-tighter">ONZSOAP</div>
-            <button id="save-btn" class="bg-[#111] text-white text-[13px] font-bold px-4 py-2 rounded-xl active:scale-95 transition">저장</button>
-        </header>
+    <div id="root-container" style="width: 1280px; display: flex; min-height: 100vh;">
+        
+        <aside class="w-64 bg-white border-r border-gray-100 flex flex-col p-6 shrink-0">
+            <div class="mb-10 text-[#3B82F6] font-black text-2xl tracking-tighter">ONZSOAP</div>
+            <nav class="space-y-1">
+                <button class="w-full text-left py-3 px-4 rounded-xl bg-[#111] text-white font-bold text-[14px]">주관적 기록</button>
+                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">객관적 기록</button>
+                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">상세 기록</button>
+                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">결과 보고서</button>
+            </nav>
+        </aside>
 
-        <main class="flex-1 p-4 space-y-6 pb-20">
-            
-            <div class="flex justify-between items-end px-1">
-                <div>
-                    <h2 class="text-sm text-gray-400 font-bold mb-1">Client Detail</h2>
-                    <p class="text-xl font-bold text-gray-800">유오운 <span class="text-gray-300 text-sm font-normal">님</span></p>
+        <main style="width: 1024px;" class="flex flex-col shrink-0 min-w-0">
+            <header class="h-14 bg-white border-b border-gray-50 flex items-center px-8 justify-between">
+                <nav class="flex items-center space-x-8 text-[14px] font-bold text-gray-400">
+                    <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800"><span>🏠 Home</span></div>
+                    <div class="flex items-center space-x-2 text-[#3B82F6] cursor-pointer"><span>👥 Client</span></div>
+                    <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800"><span>💬 Community</span></div>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[#3B82F6] font-bold text-xs">유</div>
+                    <span class="text-sm font-bold text-gray-700">유오운</span>
+                    <span class="text-gray-300 text-xs">▼</span>
                 </div>
-                <p id="save-status" class="text-[10px] text-green-500 font-bold mb-1 italic">● 마지막 저장: 방금 전</p>
+            </header>
+
+            <div class="h-12 flex items-center px-8 justify-between shrink-0 mt-4">
+                <div class="flex items-center text-gray-500 text-[14px] font-bold cursor-pointer hover:text-gray-800">
+                    <span class="mr-2 text-lg">←</span> Client Detail
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center text-[12px] font-bold text-green-500 px-3 py-1">
+                        <span class="mr-2 italic">✔</span> <span id="save-status">마지막 저장: 방금 전</span>
+                    </div>
+                    <button id="save-btn" class="bg-[#111] text-white text-[13px] font-bold px-5 py-2 rounded-xl hover:bg-gray-800 transition shadow-md">
+                        기록 저장하기
+                    </button>
+                </div>
             </div>
 
-            <div class="relative border-b border-gray-100 flex space-x-6 overflow-x-auto no-scrollbar" id="tab-container">
-                <button class="tab-item pb-3 text-black font-bold text-[15px] whitespace-nowrap shrink-0">통증 기록</button>
-                <button class="tab-item pb-3 text-gray-300 font-bold text-[15px] whitespace-nowrap shrink-0">주증상</button>
-                <button class="tab-item pb-3 text-gray-300 font-bold text-[15px] whitespace-nowrap shrink-0">과거력</button>
-                <div class="tab-line absolute bottom-0 left-0 h-[2.5px] bg-[#111]"></div>
-            </div>
+            <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 p-10 w-[976px] mx-auto">
+                    
+                    <div class="flex items-center border-b border-gray-100 mb-8 relative" id="tab-container">
+                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">1. 주증상 / 발생기전</button>
+                        <button class="tab-item mr-10 pb-4 text-black font-bold text-[15px] whitespace-nowrap outline-none">2. 통증</button>
+                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">3. 과거력 / 사회력</button>
+                        <button class="tab-item pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">4. 가족력 / 환자목표</button>
+                        <div class="tab-line absolute bottom-0 left-0 h-[2.5px] bg-[#333]"></div>
+                    </div>
 
-            <div class="bg-white rounded-[24px] p-6 shadow-sm border border-gray-50 space-y-8">
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[13px] font-bold text-gray-800 mb-2">통증 부위</label>
-                        <input type="text" placeholder="예: 오른쪽 무릎" class="w-full border-b border-gray-100 py-2 outline-none focus:border-blue-400 transition placeholder:text-gray-300">
+                    <div class="w-full bg-[#F1F6FF] border border-[#E1EAFE] rounded-xl px-5 py-3.5 flex justify-between items-center mb-10">
+                        <span class="text-[15px] font-bold text-[#4B5563]">통증</span>
+                        <span class="text-[#3B82F6] text-[10px]">▼</span>
                     </div>
-                    <div>
-                        <label class="block text-[13px] font-bold text-gray-800 mb-2">통증 강도 (0-10)</label>
-                        <select class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-[15px] outline-none appearance-none">
-                            <option>강도 선택</option>
-                            <option>1 (약한 통증)</option>
-                            <option>5 (보통)</option>
-                            <option>10 (매우 극심함)</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <label class="text-[13px] font-bold text-gray-800">통증 양상</label>
-                        <button class="select-all-btn text-[10px] font-bold text-[#3B82F6] bg-blue-50 px-2 py-1 rounded-md">전체선택</button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="check-item flex items-center space-x-3 border border-gray-50 bg-gray-50/30 rounded-xl p-4 active:bg-blue-50 transition cursor-pointer">
-                            <input type="checkbox" class="hidden">
-                            <div class="w-5 h-5 border-2 border-gray-200 rounded-md flex items-center justify-center check-box-ui shrink-0"></div>
-                            <span class="text-[14px] text-gray-600 font-semibold">쑤심</span>
-                        </label>
-                        <label class="check-item flex items-center space-x-3 border border-gray-50 bg-gray-50/30 rounded-xl p-4 active:bg-blue-50 transition cursor-pointer">
-                            <input type="checkbox" class="hidden">
-                            <div class="w-5 h-5 border-2 border-gray-200 rounded-md flex items-center justify-center check-box-ui shrink-0"></div>
-                            <span class="text-[14px] text-gray-600 font-semibold">저림</span>
-                        </label>
-                    </div>
-                </div>
+                    <div class="flex space-x-16">
+                        <div class="flex-1 space-y-10">
+                            <div class="grid grid-cols-3 gap-8">
+                                <div>
+                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">통증부위</label>
+                                    <input type="text" placeholder="통증부위 입력" class="w-full border-b border-gray-200 py-2 text-[14px] outline-none focus:border-blue-400 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">통증강도</label>
+                                    <div class="border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
+                                        강도 <span class="text-[8px]">▼</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">1일 통증 지속률(%)</label>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
+                                            지속률 <span class="text-[8px]">▼</span>
+                                        </div>
+                                        <button class="w-9 h-9 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center border border-gray-100 hover:bg-gray-100 transition">+</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-[13px] font-bold text-gray-800">기타 임상 소견</label>
-                        <div class="flex items-center space-x-2">
-                            <span id="stt-status" class="text-[10px] font-bold text-red-500 hidden animate-pulse-red">● REC</span>
-                            <button id="mic-btn" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:bg-red-50 transition">
-                                <span class="text-lg" id="mic-icon">🎙️</span>
+                            <div>
+                                <div class="flex justify-between items-center mb-5">
+                                    <label class="text-[13px] font-bold text-gray-800">통증양상</label>
+                                    <button class="select-all-btn text-[11px] font-bold text-[#3B82F6] bg-[#EFF6FF] px-3 py-1.5 rounded-lg">전체 선택</button>
+                                </div>
+                                <div class="grid grid-cols-4 gap-3">
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">쑤심</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">화끈거림</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">쥐가 남</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">둔한 통증</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">저림</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">날카로운 통증</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">짜릿한 통증</span>
+                                    </label>
+                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
+                                        <input type="checkbox" class="hidden">
+                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
+                                        <span class="text-[13px] text-gray-600 font-semibold">뻣뻣함</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="text-[13px] font-bold text-gray-800">기타</label>
+                                    <div class="flex items-center space-x-2">
+                                        <span id="stt-status" class="text-[10px] font-bold text-red-500 hidden animate-pulse-red">● REC</span>
+                                        <button id="mic-btn" class="text-gray-400 cursor-pointer hover:text-[#3B82F6] transition-colors p-1" title="음성 인식 시작">
+                                            <span class="text-lg">🎙️</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <textarea id="memo-textarea" placeholder="기타 임상 소견 입력" class="w-full h-32 bg-gray-50/50 border border-gray-100 rounded-2xl p-5 text-[14px] outline-none focus:border-blue-200 transition resize-none"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="w-[340px] shrink-0">
+                            <div id="body-chart-container" class="w-full h-[480px] border border-gray-100 rounded-2xl bg-[#FCFDFF] relative flex items-center justify-center overflow-hidden shadow-inner cursor-crosshair">
+                                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+                                <div class="text-center z-10 pointer-events-none select-none">
+                                    <div class="text-gray-200 text-6xl mb-4">👤</div>
+                                    <p class="text-gray-300 font-bold text-sm tracking-widest uppercase">Body Chart</p>
+                                </div>
+                            </div>
+                            <button id="clear-dots-btn" class="w-full mt-4 py-3 bg-white border border-gray-100 text-gray-400 text-[13px] font-bold rounded-xl hover:bg-gray-50 transition">
+                                선택 전체 취소
                             </button>
                         </div>
-                    </div>
-                    <textarea id="memo-textarea" class="w-full h-40 bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-[15px] leading-relaxed outline-none focus:border-blue-200 transition resize-none" placeholder="마이크를 눌러 음성으로 기록하세요..."></textarea>
+                    </div> 
                 </div>
             </div>
-
-            <div class="bg-white rounded-[24px] p-6 shadow-sm border border-gray-50 space-y-4">
-                <div class="flex justify-between items-center">
-                    <label class="text-[13px] font-bold text-gray-800">Body Chart <span class="text-[10px] text-blue-500 font-normal ml-1">터치하여 표시</span></label>
-                    <button id="clear-dots-btn" class="text-[11px] font-bold text-gray-400 underline">초기화</button>
-                </div>
-                <div id="body-chart-container" class="w-full aspect-[4/5] bg-[#FCFDFF] border border-gray-100 rounded-2xl relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 24px 24px;"></div>
-                    <div class="text-center z-10 pointer-events-none opacity-20">
-                        <div class="text-7xl mb-2">👤</div>
-                        <p class="text-[10px] font-black tracking-widest">BODY CHART</p>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 
     <script>
-        // 1. 탭 이동 로직
+        /* 모든 기능 스크립트 그대로 유지 */
         const tabs = document.querySelectorAll('.tab-item');
         const tabLine = document.querySelector('.tab-line');
-        const updateLine = (el) => {
-            tabLine.style.width = `${el.offsetWidth}px`;
-            tabLine.style.left = `${el.offsetLeft}px`;
-        };
-        tabs.forEach(tab => tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.replace('text-black', 'text-gray-300'));
-            tab.classList.replace('text-gray-300', 'text-black');
-            updateLine(tab);
-        }));
-        window.onload = () => updateLine(tabs[0]);
 
-        // 2. 체크박스 터치 최적화
-        document.querySelectorAll('.check-item').forEach(item => {
-            item.onclick = () => {
-                const cb = item.querySelector('input');
-                const ui = item.querySelector('.check-box-ui');
-                cb.checked = !cb.checked;
-                item.classList.toggle('bg-blue-50/50', cb.checked);
-                item.classList.toggle('border-blue-200', cb.checked);
-                ui.classList.toggle('bg-blue-500', cb.checked);
-                ui.classList.toggle('border-blue-500', cb.checked);
-                ui.innerHTML = cb.checked ? '<span class="text-white text-[10px]">✓</span>' : '';
-            };
-        });
-
-        // 3. 바디 차트 터치 (모바일 좌표 완벽 보정)
-        const chart = document.getElementById('body-chart-container');
-        chart.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = chart.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
-            const dot = document.createElement('div');
-            dot.className = 'absolute w-5 h-5 bg-red-500/80 rounded-full border-2 border-white shadow-lg dot-point pointer-events-none';
-            dot.style.left = `${x - 10}px`;
-            dot.style.top = `${y - 10}px`;
-            chart.appendChild(dot);
-        });
-        document.getElementById('clear-dots-btn').onclick = () => {
-            chart.querySelectorAll('.dot-point').forEach(d => d.remove());
-        };
-
-        // 4. STT (음성 인식) - 기존 기능 유지
-        const micBtn = document.getElementById('mic-btn');
-        const memo = document.getElementById('memo-textarea');
-        const sttStatus = document.getElementById('stt-status');
-        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (Recognition) {
-            const rec = new Recognition();
-            rec.continuous = true;
-            rec.interimResults = true;
-            rec.lang = 'ko-KR';
-            let isRec = false;
-
-            micBtn.onclick = () => isRec ? rec.stop() : rec.start();
-            rec.onstart = () => {
-                isRec = true;
-                sttStatus.classList.remove('hidden');
-                micBtn.classList.add('bg-red-50');
-                document.getElementById('mic-icon').innerText = '⏹️';
-            };
-            rec.onresult = (e) => {
-                let final = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) final += e.results[i][0].transcript;
-                }
-                if (final) memo.value += (memo.value ? ' ' : '') + final;
-            };
-            rec.onend = () => {
-                isRec = false;
-                sttStatus.classList.add('hidden');
-                micBtn.classList.remove('bg-red-50');
-                document.getElementById('mic-icon').innerText = '🎙️';
-            };
-            rec.onerror = () => rec.stop();
+        function moveLine(element) {
+            const rect = element.getBoundingClientRect();
+            const containerRect = document.getElementById('tab-container').getBoundingClientRect();
+            tabLine.style.width = `${rect.width}px`;
+            tabLine.style.left = `${rect.left - containerRect.left}px`;
         }
 
-        // 5. 저장 버튼 애니메이션
-        document.getElementById('save-btn').onclick = function() {
-            this.innerText = "저장됨";
-            setTimeout(() => { this.innerText = "저장"; }, 2000);
-            alert('기록이 성공적으로 저장되었습니다.');
-        };
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => { t.classList.remove('text-black'); t.classList.add('text-gray-300'); });
+                tab.classList.add('text-black'); tab.classList.remove('text-gray-300');
+                moveLine(tab);
+            });
+        });
+
+        window.onload = () => { moveLine(tabs[1]); };
+
+        const checkItems = document.querySelectorAll('.check-item');
+        checkItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const boxUI = item.querySelector('.check-box-ui');
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    item.classList.add('border-blue-500', 'bg-blue-50/50');
+                    boxUI.classList.add('bg-blue-500', 'border-blue-500');
+                    boxUI.innerHTML = '<span class="text-white text-[10px]">✓</span>';
+                } else {
+                    item.classList.remove('border-blue-500', 'bg-blue-50/50');
+                    boxUI.classList.remove('bg-blue-500', 'border-blue-500');
+                    boxUI.innerHTML = '';
+                }
+            });
+        });
+
+        document.querySelector('.select-all-btn').addEventListener('click', () => {
+            checkItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if(!checkbox.checked) item.click();
+            });
+        });
+
+        const chartContainer = document.getElementById('body-chart-container');
+        chartContainer.addEventListener('click', function(e) {
+            const rect = chartContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const dot = document.createElement('div');
+            dot.className = 'absolute w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)] pointer-events-none dot-point';
+            dot.style.left = `${x - 6}px`; dot.style.top = `${y - 6}px`;
+            dot.dataset.x = x.toFixed(2); dot.dataset.y = y.toFixed(2);
+            chartContainer.appendChild(dot);
+        });
+
+        document.getElementById('clear-dots-btn').addEventListener('click', () => {
+            chartContainer.querySelectorAll('.dot-point').forEach(dot => dot.remove());
+        });
+
+        const micBtn = document.getElementById('mic-btn');
+        const memoTextarea = document.getElementById('memo-textarea');
+        const sttStatus = document.getElementById('stt-status');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'ko-KR';
+            let isRecognizing = false;
+            micBtn.addEventListener('click', () => { isRecognizing ? recognition.stop() : recognition.start(); });
+            recognition.onstart = () => { isRecognizing = true; micBtn.classList.add('text-red-500'); sttStatus.classList.remove('hidden'); };
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                }
+                if (finalTranscript) memoTextarea.value += (memoTextarea.value ? ' ' : '') + finalTranscript;
+            };
+            recognition.onerror = () => { isRecognizing = false; sttStatus.classList.add('hidden'); micBtn.classList.remove('text-red-500'); };
+            recognition.onend = () => { isRecognizing = false; micBtn.classList.remove('text-red-500'); sttStatus.classList.add('hidden'); };
+        } else {
+            micBtn.style.display = 'none';
+        }
+
+        const saveBtn = document.getElementById('save-btn');
+        saveBtn.addEventListener('click', () => {
+            saveBtn.innerText = "저장 중...";
+            setTimeout(() => {
+                saveBtn.innerText = "기록 저장하기";
+                document.getElementById('save-status').innerText = `마지막 저장: ${new Date().toLocaleTimeString()}`;
+                alert('모든 데이터가 저장되었습니다.');
+            }, 600);
+        });
     </script>
 </body>
 </html>
