@@ -3,15 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로또 번호 생성기</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ONZSOAP 예약 시스템 - 시간 오류 수정본</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;900&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #fff; }
+        .dropdown-menu { display: none; z-index: 100; }
+        .dropdown-menu.show { display: block; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .card-anim { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>로또 번호 생성기</h1>
-        <div id="lotto-numbers" class="lotto-numbers-container"></div>
-        <button id="generate-btn">번호 생성</button>
+<body class="bg-gray-50/20 dark:bg-gray-900">
+    <script>
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <header class="flex items-center justify-between px-10 py-3 bg-white border-b border-gray-100 sticky top-0 z-[60] dark:bg-gray-800 dark:border-gray-700">
+        <div class="text-[20px] font-black text-[#3B82F6] tracking-tighter">ONZSOAP</div>
+        <nav class="flex space-x-10 text-[14px] font-semibold text-gray-500 dark:text-gray-400">
+            <div class="flex items-center space-x-1.5 text-[#3B82F6] cursor-pointer"><i data-lucide="home" class="w-4 h-4"></i><span>Home</span></div>
+            <div class="flex items-center space-x-1.5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="users" class="w-4 h-4"></i><span>Client</span></div>
+            <div class="flex items-center space-x-1.5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="message-square" class="w-4 h-4"></i><span>Community</span></div>
+            <div class="flex items-center space-x-1.5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="book-open" class="w-4 h-4"></i><span>Book</span></div>
+            <button id="theme-toggle" class="flex items-center space-x-1.5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+                <i data-lucide="moon" class="w-4 h-4"></i>
+                <span class="sr-only">Toggle dark mode</span>
+            </button>
+        </nav>
+        <div class="flex items-center space-x-2 text-[13px]">
+            <div class="w-7 h-7 bg-[#EEF2FF] rounded-full flex items-center justify-center text-[#6366F1] font-bold">유</div>
+            <span class="font-semibold text-gray-700 dark:text-gray-200">Kasey</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+        </div>
+    </header>
+
+    <div class="px-10 py-6 bg-white border-b border-gray-50 dark:bg-gray-800/50 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-8 text-[18px] font-bold text-[#111] dark:text-white">
+                <i data-lucide="chevron-left" class="text-gray-300 cursor-pointer hover:text-gray-600 dark:hover:text-gray-400"></i>
+                <span>2025년 11월 20일 목</span>
+                <i data-lucide="chevron-right" class="text-gray-300 cursor-pointer hover:text-gray-600 dark:hover:text-gray-400"></i>
+            </div>
+            <div class="flex items-center space-x-2">
+                <div class="flex bg-[#F1F5F9] dark:bg-gray-700 p-1 rounded-lg border border-gray-100 dark:border-gray-600">
+                    <button class="px-5 py-1.5 bg-white dark:bg-blue-500 dark:text-white text-[#3B82F6] shadow-sm rounded-md text-[13px] font-bold">일간</button>
+                    <button class="px-5 py-1.5 text-gray-400 text-[13px] font-bold hover:text-gray-600 dark:hover:text-gray-200">주간</button>
+                    <button class="px-5 py-1.5 text-gray-400 text-[13px] font-bold hover:text-gray-600 dark:hover:text-gray-200">월간</button>
+                    <button class="px-5 py-1.5 text-gray-400 text-[13px] font-bold hover:text-gray-600 dark:hover:text-gray-200">목록</button>
+                </div>
+                <button class="flex items-center space-x-1.5 border border-gray-200 dark:border-gray-600 px-4 py-2 rounded-lg font-bold text-[14px] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <i data-lucide="filter" class="w-4 h-4"></i><span>필터</span>
+                </button>
+                <button onclick="addReservationFromFilters()" class="bg-[#3B82F6] text-white px-5 py-2 rounded-lg font-bold text-[14px] shadow-lg shadow-blue-100 flex items-center space-x-1.5 hover:bg-blue-600 transition-colors active:scale-95">
+                    <i data-lucide="plus" class="w-5 h-5"></i><span>예약 추가</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-5 gap-3 relative">
+            <div class="relative dropdown-container">
+                <label class="text-[11px] font-bold text-gray-400 mb-1.5 block ml-0.5">치료사</label>
+                <button onclick="toggleDropdown(event, 'therapist')" class="w-full flex items-center justify-between border border-blue-400 rounded-lg px-4 py-2.5 bg-white dark:bg-gray-700 dark:border-blue-500 text-[14px] transition-all">
+                    <span id="therapist-selected" class="text-gray-700 dark:text-gray-200 font-medium">전체</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-blue-500"></i>
+                </button>
+                <div id="therapist-menu" class="dropdown-menu absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl overflow-hidden">
+                    <div onclick="selectItem('therapist', '전체')" class="px-4 py-2.5 bg-[#3B82F6] text-white text-[14px] cursor-pointer">전체</div>
+                    <div onclick="selectItem('therapist', '김이름')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">김이름</div>
+                    <div onclick="selectItem('therapist', '박이름')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">박이름</div>
+                </div>
+            </div>
+
+            <div class="relative dropdown-container">
+                <label class="text-[11px] font-bold text-gray-400 mb-1.5 block ml-0.5">치료실</label>
+                <button onclick="toggleDropdown(event, 'room')" class="w-full flex items-center justify-between border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2.5 bg-white dark:bg-gray-700 text-[14px]">
+                    <span id="room-selected" class="text-gray-700 dark:text-gray-200 font-medium">전체</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-blue-500"></i>
+                </button>
+                <div id="room-menu" class="dropdown-menu absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl overflow-hidden">
+                    <div onclick="selectItem('room', '전체')" class="px-4 py-2.5 bg-[#3B82F6] text-white text-[14px] cursor-pointer">전체</div>
+                    <div onclick="selectItem('room', '치료실 1')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">치료실 1</div>
+                    <div onclick="selectItem('room', '치료실 2')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">치료실 2</div>
+                </div>
+            </div>
+
+            <div class="relative dropdown-container">
+                <label class="text-[11px] font-bold text-gray-400 mb-1.5 block ml-0.5">예약 상태</label>
+                <button onclick="toggleDropdown(event, 'status')" class="w-full flex items-center justify-between border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2.5 bg-white dark:bg-gray-700 text-[14px]">
+                    <span id="status-selected" class="text-gray-700 dark:text-gray-200 font-medium">전체</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-blue-500"></i>
+                </button>
+                <div id="status-menu" class="dropdown-menu absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl overflow-hidden">
+                    <div onclick="selectItem('status', '전체')" class="px-4 py-2.5 bg-[#3B82F6] text-white text-[14px] cursor-pointer">전체</div>
+                    <div onclick="selectItem('status', '확정')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">확정</div>
+                    <div onclick="selectItem('status', '취소')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] text-gray-600 dark:text-gray-300 cursor-pointer">취소</div>
+                </div>
+            </div>
+
+            <div class="relative dropdown-container">
+                <label class="text-[11px] font-bold text-gray-400 mb-1.5 block ml-0.5">시작 시간</label>
+                <button onclick="toggleDropdown(event, 'start')" class="w-full flex items-center justify-between border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2.5 bg-white dark:bg-gray-700 text-[14px]">
+                    <span id="start-selected" class="text-gray-700 dark:text-gray-200 font-medium">09:00</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-blue-500"></i>
+                </button>
+                <div id="start-menu" class="dropdown-menu absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 rounded-lg shadow-xl max-h-64 overflow-y-auto custom-scrollbar"></div>
+            </div>
+
+            <div class="relative dropdown-container">
+                <label class="text-[11px] font-bold text-gray-400 mb-1.5 block ml-0.5">종료 시간</label>
+                <button onclick="toggleDropdown(event, 'end')" class="w-full flex items-center justify-between border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2.5 bg-white dark:bg-gray-700 text-[14px]">
+                    <span id="end-selected" class="text-gray-700 dark:text-gray-200 font-medium">10:30</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-blue-500"></i>
+                </button>
+                <div id="end-menu" class="dropdown-menu absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 rounded-lg shadow-xl max-h-64 overflow-y-auto custom-scrollbar"></div>
+            </div>
+        </div>
+
+        <div class="flex space-x-5 mt-6 px-1">
+            <div class="flex items-center space-x-2"><div class="w-3.5 h-3.5 bg-[#3B82F6] rounded-[3px]"></div><span class="text-[13px] font-bold text-gray-400">예약</span></div>
+            <div class="flex items-center space-x-2"><div class="w-3.5 h-3.5 bg-[#22C55E] rounded-[3px]"></div><span class="text-[13px] font-bold text-gray-400">완료</span></div>
+            <div class="flex items-center space-x-2"><div class="w-3.5 h-3.5 bg-[#94A3B8] rounded-[3px]"></div><span class="text-[13px] font-bold text-gray-400">취소</span></div>
+        </div>
     </div>
-    <script type="module" src="main.js"></script>
+
+    <div class="px-10 py-8 bg-[#FDFDFD] dark:bg-gray-800">
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm dark:bg-gray-900 dark:border-gray-700" id="timeline-container">
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        themeToggle.addEventListener('click', () => {
+            // if set via local storage previously
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+
+            // if NOT set via local storage previously
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+    </script>
+    <script>
+        lucide.createIcons();
+
+        // 1. 시간 옵션 생성 (08:00 ~ 24:00)
+        const timeOptions = [];
+        for(let i=8; i<=24; i++) {
+            const h = String(i).padStart(2, '0');
+            timeOptions.push(`${h}:00`);
+            timeOptions.push(`${h}:30`);
+        }
+
+        function populateMenus() {
+            const startMenu = document.getElementById('start-menu');
+            const endMenu = document.getElementById('end-menu');
+            timeOptions.forEach(time => {
+                startMenu.innerHTML += `<div onclick="selectItem('start', '${time}')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] cursor-pointer border-b border-gray-50 dark:border-gray-800">${time}</div>`;
+                endMenu.innerHTML += `<div onclick="selectItem('end', '${time}')" class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-[14px] cursor-pointer border-b border-gray-50 dark:border-gray-800">${time}</div>`;
+            });
+        }
+
+        // 2. 타임라인 생성 (08:00 ~ 20:00 고정 행)
+        function createTimelineRows() {
+            const container = document.getElementById('timeline-container');
+            const displayHours = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+            
+            displayHours.forEach(time => {
+                const hourId = time.split(':')[0]; // "09", "10" 등
+                container.innerHTML += `
+                    <div class="flex border-b border-gray-100 dark:border-gray-800 min-h-[115px] relative" id="row-${hourId}">
+                        <div class="w-[110px] bg-gray-50/20 dark:bg-gray-800/20 border-r border-gray-100 dark:border-gray-800 flex justify-center pt-4 text-[13px] text-gray-400 font-bold">${time}</div>
+                        <div class="flex-grow p-3 slot-content"></div>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. 예약 추가 로직 (오류 수정 핵심)
+        function addReservationFromFilters() {
+            const therapist = document.getElementById('therapist-selected').innerText;
+            const status = document.getElementById('status-selected').innerText;
+            const startTime = document.getElementById('start-selected').innerText; // "09:00"
+            const endTime = document.getElementById('end-selected').innerText;
+
+            // [수정] 시작 시간의 "시" 부분을 추출하여 해당 Row ID와 정확히 매칭
+            const startHour = startTime.split(':')[0]; 
+            const targetRow = document.querySelector(`#row-${startHour} .slot-content`);
+
+            if (!targetRow) {
+                alert("해당 시간대는 현재 타임라인 화면에 없습니다.");
+                return;
+            }
+
+            // 테마 설정
+            let theme = { bg: 'bg-[#EFF6FF]', border: 'border-[#3B82F6]', text: 'text-[#1E40AF]', sub: 'text-[#3B82F6]', label: '예약', check: '' };
+            if (status === '확정') {
+                theme = { bg: 'bg-[#E7F9F0]', border: 'border-[#22C55E]', text: 'text-[#166534]', sub: 'text-[#22C55E]', label: '확정', check: '✓' };
+            } else if (status === '취소') {
+                theme = { bg: 'bg-[#F1F5F9]', border: 'border-[#94A3B8]', text: 'text-[#334155]', sub: 'text-[#64748B]', label: '취소', check: '' };
+            }
+            
+            let card;
+
+            if(document.documentElement.classList.contains('dark')) {
+                if (status === '확정') {
+                    theme = { bg: 'dark:bg-green-900/50', border: 'dark:border-green-500', text: 'dark:text-green-200', sub: 'dark:text-green-400', label: '확정', check: '✓' };
+                } else if (status === '취소') {
+                    theme = { bg: 'dark:bg-gray-700', border: 'dark:border-gray-500', text: 'dark:text-gray-300', sub: 'dark:text-gray-400', label: '취소', check: '' };
+                } else {
+                    theme = { bg: 'dark:bg-blue-900/50', border: 'dark:border-blue-500', text: 'dark:text-blue-200', sub: 'dark:text-blue-400', label: '예약', check: '' };
+                }
+                
+                card = `
+                <div class="${theme.bg} border-l-[6px] ${theme.border} rounded-r-xl p-5 w-full max-w-[420px] shadow-sm card-anim mb-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="text-[17px] font-bold ${theme.text}">새 예약 환자</h4>
+                            <p class="text-[13px] font-bold ${theme.sub} mt-1">남성 · 20세</p>
+                            <p class="text-[13px] font-bold ${theme.sub}">${therapist === '전체' ? '미지정' : therapist + ' 치료사'}</p>
+                        </div>
+                        <span class="bg-gray-800/90 px-2 py-0.5 rounded text-[11px] font-black text-gray-400 border border-gray-700">${startTime} - ${endTime}</span>
+                    </div>
+                    <div class="mt-4 flex items-center text-[12px] font-bold ${theme.sub}">
+                        <div class="w-4 h-4 border ${theme.border} rounded flex items-center justify-center mr-2 bg-gray-800 text-[10px]">${theme.check}</div> ${theme.label}
+                    </div>
+                </div>
+            `;
+            } else {
+                card = `
+                    <div class="${theme.bg} border-l-[6px] ${theme.border} rounded-r-xl p-5 w-full max-w-[420px] shadow-sm card-anim mb-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-[17px] font-bold ${theme.text}">새 예약 환자</h4>
+                                <p class="text-[13px] font-bold ${theme.sub} mt-1">남성 · 20세</p>
+                                <p class="text-[13px] font-bold ${theme.sub}">${therapist === '전체' ? '미지정' : therapist + ' 치료사'}</p>
+                            </div>
+                            <span class="bg-white/90 px-2 py-0.5 rounded text-[11px] font-black text-gray-400 border border-gray-100">${startTime} - ${endTime}</span>
+                        </div>
+                        <div class="mt-4 flex items-center text-[12px] font-bold ${theme.sub}">
+                            <div class="w-4 h-4 border ${theme.border} rounded flex items-center justify-center mr-2 bg-white text-[10px]">${theme.check}</div> ${theme.label}
+                        </div>
+                    </div>
+                `;
+            }
+
+            targetRow.innerHTML += card;
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // 드롭다운 및 선택 함수
+        function toggleDropdown(event, type) {
+            event.stopPropagation();
+            const menu = document.getElementById(`${type}-menu`);
+            const isShowing = menu.classList.contains('show');
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            if (!isShowing) menu.classList.add('show');
+        }
+
+        function selectItem(type, value) {
+            document.getElementById(`${type}-selected`).innerText = value;
+            document.getElementById(`${type}-menu`).classList.remove('show');
+            
+            const items = document.querySelectorAll(`#${type}-menu div`);
+            items.forEach(item => {
+                if (item.innerText === value) {
+                    item.classList.add('bg-[#3B82F6]', 'text-white');
+                } else {
+                    item.classList.remove('bg-[#3B82F6]', 'text-white');
+                }
+            });
+        }
+
+        window.onclick = () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+
+        // 실행
+        populateMenus();
+        createTimelineRows();
+    </script>
 </body>
 </html>
