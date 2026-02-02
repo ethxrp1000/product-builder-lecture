@@ -2,39 +2,30 @@
 <html lang="ko" style="width: 1280px;"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=0.1, user-scalable=yes">
-    <title>ONZSOAP - Client Detail</title>
+    <title>ONZSOAP - Client Detail (ROM Measure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght @400;600;700;900&display=swap');
-        
-        /* 모바일 브라우저의 자동 폰트 크기 조절 방지 */
         html { -webkit-text-size-adjust: none; text-size-adjust: none; }
-
         body { 
             font-family: 'Pretendard', sans-serif; 
             letter-spacing: -0.02em; 
-            width: 1280px; /* 1. 바디 너비 고정 */
-            min-width: 1280px;
-            margin: 0 auto;
-            overflow-x: auto;
+            width: 1280px; margin: 0 auto;
             background: #F8F9FA;
         }
-
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         .tab-line { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        @keyframes pulse-red {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .animate-pulse-red { animation: pulse-red 1.5s infinite; }
     </style>
 </head>
 <body class="bg-[#F8F9FA]">
 
     <div id="root-container" style="width: 1280px; display: flex; min-height: 100vh;">
-        
         <aside class="w-64 bg-white border-r border-gray-100 flex flex-col p-6 shrink-0">
             <div class="mb-10 text-[#3B82F6] font-black text-2xl tracking-tighter">ONZSOAP</div>
             <nav class="space-y-1">
@@ -55,7 +46,6 @@
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[#3B82F6] font-bold text-xs">유</div>
                     <span class="text-sm font-bold text-gray-700">유오운</span>
-                    <span class="text-gray-300 text-xs">▼</span>
                 </div>
             </header>
 
@@ -67,26 +57,18 @@
                     <div class="flex items-center text-[12px] font-bold text-green-500 px-3 py-1">
                         <span class="mr-2 italic">✔</span> <span id="save-status">마지막 저장: 방금 전</span>
                     </div>
-                    <button id="save-btn" class="bg-[#111] text-white text-[13px] font-bold px-5 py-2 rounded-xl hover:bg-gray-800 transition shadow-md">
-                        기록 저장하기
-                    </button>
+                    <button id="save-btn" class="bg-[#111] text-white text-[13px] font-bold px-5 py-2 rounded-xl hover:bg-gray-800 shadow-md transition">기록 저장하기</button>
                 </div>
             </div>
 
             <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
                 <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 p-10 w-[976px] mx-auto">
-                    
                     <div class="flex items-center border-b border-gray-100 mb-8 relative" id="tab-container">
-                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">1. 주증상 / 발생기전</button>
-                        <button class="tab-item mr-10 pb-4 text-black font-bold text-[15px] whitespace-nowrap outline-none">2. 통증</button>
-                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">3. 과거력 / 사회력</button>
-                        <button class="tab-item pb-4 text-gray-300 font-bold text-[15px] whitespace-nowrap outline-none">4. 가족력 / 환자목표</button>
+                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] outline-none">1. 주증상 / 발생기전</button>
+                        <button class="tab-item mr-10 pb-4 text-black font-bold text-[15px] outline-none">2. 통증</button>
+                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] outline-none">3. 과거력 / 사회력</button>
+                        <button class="tab-item pb-4 text-gray-300 font-bold text-[15px] outline-none">4. 가족력 / 환자목표</button>
                         <div class="tab-line absolute bottom-0 left-0 h-[2.5px] bg-[#333]"></div>
-                    </div>
-
-                    <div class="w-full bg-[#F1F6FF] border border-[#E1EAFE] rounded-xl px-5 py-3.5 flex justify-between items-center mb-10">
-                        <span class="text-[15px] font-bold text-[#4B5563]">통증</span>
-                        <span class="text-[#3B82F6] text-[10px]">▼</span>
                     </div>
 
                     <div class="flex space-x-16">
@@ -104,89 +86,36 @@
                                 </div>
                                 <div>
                                     <label class="block text-[13px] font-bold text-gray-800 mb-3">1일 통증 지속률(%)</label>
-                                    <div class="flex items-center space-x-2">
-                                        <div class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
-                                            지속률 <span class="text-[8px]">▼</span>
-                                        </div>
-                                        <button class="w-9 h-9 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center border border-gray-100 hover:bg-gray-100 transition">+</button>
+                                    <div class="border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
+                                        지속률 <span class="text-[8px]">▼</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between items-center mb-5">
-                                    <label class="text-[13px] font-bold text-gray-800">통증양상</label>
-                                    <button class="select-all-btn text-[11px] font-bold text-[#3B82F6] bg-[#EFF6FF] px-3 py-1.5 rounded-lg">전체 선택</button>
-                                </div>
-                                <div class="grid grid-cols-4 gap-3">
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">쑤심</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">화끈거림</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">쥐가 남</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">둔한 통증</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">저림</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">날카로운 통증</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">짜릿한 통증</span>
-                                    </label>
-                                    <label class="check-item flex items-center space-x-3 border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 transition cursor-pointer">
-                                        <input type="checkbox" class="hidden">
-                                        <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center check-box-ui"></div>
-                                        <span class="text-[13px] text-gray-600 font-semibold">뻣뻣함</span>
-                                    </label>
                                 </div>
                             </div>
 
                             <div>
                                 <div class="flex justify-between items-center mb-3">
-                                    <label class="text-[13px] font-bold text-gray-800">기타</label>
-                                    <div class="flex items-center space-x-2">
+                                    <label class="text-[13px] font-bold text-gray-800">기타 임상 소견</label>
+                                    <div class="flex items-center space-x-3">
                                         <span id="stt-status" class="text-[10px] font-bold text-red-500 hidden animate-pulse-red">● REC</span>
                                         <button id="mic-btn" class="text-gray-400 cursor-pointer hover:text-[#3B82F6] transition-colors p-1" title="음성 인식 시작">
                                             <span class="text-lg">🎙️</span>
                                         </button>
+                                        <button id="cam-btn" class="text-gray-400 cursor-pointer hover:text-green-500 transition-colors p-1" title="카메라 측정 시작">
+                                            <span class="text-lg">📷</span>
+                                        </button>
                                     </div>
                                 </div>
-                                <textarea id="memo-textarea" placeholder="기타 임상 소견 입력" class="w-full h-32 bg-gray-50/50 border border-gray-100 rounded-2xl p-5 text-[14px] outline-none focus:border-blue-200 transition resize-none"></textarea>
+                                <textarea id="memo-textarea" placeholder="측정 결과 및 임상 소견이 여기에 입력됩니다." class="w-full h-32 bg-gray-50/50 border border-gray-100 rounded-2xl p-5 text-[14px] outline-none focus:border-blue-200 transition resize-none"></textarea>
                             </div>
                         </div>
 
                         <div class="w-[340px] shrink-0">
                             <div id="body-chart-container" class="w-full h-[480px] border border-gray-100 rounded-2xl bg-[#FCFDFF] relative flex items-center justify-center overflow-hidden shadow-inner cursor-crosshair">
-                                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
                                 <div class="text-center z-10 pointer-events-none select-none">
                                     <div class="text-gray-200 text-6xl mb-4">👤</div>
                                     <p class="text-gray-300 font-bold text-sm tracking-widest uppercase">Body Chart</p>
                                 </div>
                             </div>
-                            <button id="clear-dots-btn" class="w-full mt-4 py-3 bg-white border border-gray-100 text-gray-400 text-[13px] font-bold rounded-xl hover:bg-gray-50 transition">
-                                선택 전체 취소
-                            </button>
                         </div>
                     </div> 
                 </div>
@@ -194,18 +123,39 @@
         </main>
     </div>
 
+    <div id="cam-modal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-10">
+        <div class="bg-white rounded-[32px] w-full max-w-4xl overflow-hidden relative shadow-2xl">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="font-bold text-lg">실시간 가동범위(ROM) 측정</h3>
+                <button id="close-cam" class="text-gray-400 hover:text-black text-2xl">×</button>
+            </div>
+            <div class="relative bg-black flex justify-center">
+                <video id="input_video" class="hidden"></video>
+                <canvas id="output_canvas" width="800" height="600" class="w-full h-auto"></canvas>
+                <div class="absolute top-5 right-5 bg-black/60 text-white p-4 rounded-2xl backdrop-blur-md">
+                    <p class="text-[10px] text-gray-300 uppercase font-bold mb-1">Current Angle</p>
+                    <p class="text-4xl font-black text-green-400" id="current-angle">0°</p>
+                    <p class="text-[10px] text-gray-300 uppercase font-bold mt-3 mb-1">Max Recorded</p>
+                    <p class="text-2xl font-black text-blue-400" id="max-angle">0°</p>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 flex justify-center space-x-4">
+                <button id="reset-max" class="px-6 py-2 bg-white border rounded-xl font-bold text-sm hover:bg-gray-100 transition">기록 초기화</button>
+                <button id="apply-rom" class="px-6 py-2 bg-[#111] text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition shadow-lg">결과 반영하기</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        /* 모든 기능 스크립트 그대로 유지 */
+        // --- 1. 기본 UI 로직 ---
         const tabs = document.querySelectorAll('.tab-item');
         const tabLine = document.querySelector('.tab-line');
-
         function moveLine(element) {
             const rect = element.getBoundingClientRect();
             const containerRect = document.getElementById('tab-container').getBoundingClientRect();
             tabLine.style.width = `${rect.width}px`;
             tabLine.style.left = `${rect.left - containerRect.left}px`;
         }
-
         tabs.forEach((tab) => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => { t.classList.remove('text-black'); t.classList.add('text-gray-300'); });
@@ -213,82 +163,117 @@
                 moveLine(tab);
             });
         });
-
         window.onload = () => { moveLine(tabs[1]); };
 
-        const checkItems = document.querySelectorAll('.check-item');
-        checkItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const boxUI = item.querySelector('.check-box-ui');
-                checkbox.checked = !checkbox.checked;
-                if (checkbox.checked) {
-                    item.classList.add('border-blue-500', 'bg-blue-50/50');
-                    boxUI.classList.add('bg-blue-500', 'border-blue-500');
-                    boxUI.innerHTML = '<span class="text-white text-[10px]">✓</span>';
-                } else {
-                    item.classList.remove('border-blue-500', 'bg-blue-50/50');
-                    boxUI.classList.remove('bg-blue-500', 'border-blue-500');
-                    boxUI.innerHTML = '';
-                }
-            });
-        });
-
-        document.querySelector('.select-all-btn').addEventListener('click', () => {
-            checkItems.forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                if(!checkbox.checked) item.click();
-            });
-        });
-
-        const chartContainer = document.getElementById('body-chart-container');
-        chartContainer.addEventListener('click', function(e) {
-            const rect = chartContainer.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const dot = document.createElement('div');
-            dot.className = 'absolute w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)] pointer-events-none dot-point';
-            dot.style.left = `${x - 6}px`; dot.style.top = `${y - 6}px`;
-            dot.dataset.x = x.toFixed(2); dot.dataset.y = y.toFixed(2);
-            chartContainer.appendChild(dot);
-        });
-
-        document.getElementById('clear-dots-btn').addEventListener('click', () => {
-            chartContainer.querySelectorAll('.dot-point').forEach(dot => dot.remove());
-        });
-
-        const micBtn = document.getElementById('mic-btn');
+        // --- 2. 카메라 및 ROM 측정 로직 (최적화 버전) ---
+        const camBtn = document.getElementById('cam-btn');
+        const camModal = document.getElementById('cam-modal');
+        const closeCam = document.getElementById('close-cam');
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const angleDisplay = document.getElementById('current-angle');
+        const maxAngleDisplay = document.getElementById('max-angle');
         const memoTextarea = document.getElementById('memo-textarea');
+
+        let maxROM = 0;
+
+        function calculateAngle(a, b, c) {
+            const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+            let angle = Math.abs((radians * 180.0) / Math.PI);
+            if (angle > 180.0) angle = 360 - angle;
+            return angle;
+        }
+
+        const pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+        });
+
+        pose.setOptions({
+            modelComplexity: 0,      // 모바일 최적화
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        pose.onResults((results) => {
+            if (!results.poseLandmarks) return;
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#E1EAFE', lineWidth: 2});
+            drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#3B82F6', lineWidth: 1, radius: 3});
+
+            const shoulder = results.poseLandmarks[11];
+            const elbow = results.poseLandmarks[13];
+            const wrist = results.poseLandmarks[15];
+
+            if (shoulder && elbow && wrist && elbow.visibility > 0.5) {
+                const angle = calculateAngle(shoulder, elbow, wrist);
+                const displayAngle = Math.round(angle);
+                
+                angleDisplay.innerText = `${displayAngle}°`;
+                if (displayAngle > maxROM) {
+                    maxROM = displayAngle;
+                    maxAngleDisplay.innerText = `${maxROM}°`;
+                }
+            }
+            canvasCtx.restore();
+        });
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => { await pose.send({image: videoElement}); },
+            width: 640, height: 480,
+            facingMode: 'environment' // 후면 카메라 우선
+        });
+
+        camBtn.addEventListener('click', () => {
+            camModal.classList.remove('hidden');
+            maxROM = 0;
+            maxAngleDisplay.innerText = '0°';
+            camera.start().catch(err => alert("HTTPS 환경 혹은 카메라 권한을 확인해주세요."));
+        });
+
+        closeCam.addEventListener('click', () => {
+            camModal.classList.add('hidden');
+            camera.stop();
+        });
+
+        document.getElementById('reset-max').addEventListener('click', () => {
+            maxROM = 0;
+            maxAngleDisplay.innerText = '0°';
+        });
+
+        document.getElementById('apply-rom').addEventListener('click', () => {
+            const timestamp = new Date().toLocaleTimeString();
+            memoTextarea.value += (memoTextarea.value ? '\n' : '') + `[관절 측정 - ${timestamp}] 부위: 팔꿈치 / ROM: ${maxROM}°`;
+            camModal.classList.add('hidden');
+            camera.stop();
+        });
+
+        // --- 3. 음성 인식 (STT) 로직 ---
+        const micBtn = document.getElementById('mic-btn');
         const sttStatus = document.getElementById('stt-status');
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (SpeechRecognition) {
             const recognition = new SpeechRecognition();
-            recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'ko-KR';
-            let isRecognizing = false;
-            micBtn.addEventListener('click', () => { isRecognizing ? recognition.stop() : recognition.start(); });
-            recognition.onstart = () => { isRecognizing = true; micBtn.classList.add('text-red-500'); sttStatus.classList.remove('hidden'); };
-            recognition.onresult = (event) => {
-                let finalTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
-                }
-                if (finalTranscript) memoTextarea.value += (memoTextarea.value ? ' ' : '') + finalTranscript;
+            recognition.continuous = true; recognition.lang = 'ko-KR';
+            let isRec = false;
+            micBtn.addEventListener('click', () => { isRec ? recognition.stop() : recognition.start(); });
+            recognition.onstart = () => { isRec = true; sttStatus.classList.remove('hidden'); micBtn.classList.add('text-red-500'); };
+            recognition.onend = () => { isRec = false; sttStatus.classList.add('hidden'); micBtn.classList.remove('text-red-500'); };
+            recognition.onresult = (e) => {
+                const text = e.results[e.results.length-1][0].transcript;
+                memoTextarea.value += (memoTextarea.value ? ' ' : '') + text;
             };
-            recognition.onerror = () => { isRecognizing = false; sttStatus.classList.add('hidden'); micBtn.classList.remove('text-red-500'); };
-            recognition.onend = () => { isRecognizing = false; micBtn.classList.remove('text-red-500'); sttStatus.classList.add('hidden'); };
-        } else {
-            micBtn.style.display = 'none';
         }
 
-        const saveBtn = document.getElementById('save-btn');
-        saveBtn.addEventListener('click', () => {
-            saveBtn.innerText = "저장 중...";
-            setTimeout(() => {
-                saveBtn.innerText = "기록 저장하기";
-                document.getElementById('save-status').innerText = `마지막 저장: ${new Date().toLocaleTimeString()}`;
-                alert('모든 데이터가 저장되었습니다.');
-            }, 600);
+        // --- 4. 저장 버튼 로직 ---
+        document.getElementById('save-btn').addEventListener('click', () => {
+            alert('기록이 성공적으로 저장되었습니다.');
         });
     </script>
 </body>
