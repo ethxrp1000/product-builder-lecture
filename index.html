@@ -807,7 +807,37 @@
             "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=2070&auto=format&fit=crop",
             "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2175&auto=format&fit=crop",
             "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1974&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop"
+            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1414609245292-abf16f398f62?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1470770841028-ad23b72c69e2?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1465146344425-f0490e0c2912?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1490730141103-6fd1c0f04eb5?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1473859182333-8a39783f98c8?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1459262838948-33f7b6016944?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1475932822765-a864700d867c?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1483728645009-dd77395e263d?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1451187580459-490d969a3d3b?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1469854523086-dd00bc324bce?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1457460867824-00e998bb1261?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1502677271427-4c07c74d5507?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1504958172901-b65f3a0937a4?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1503756234588-48b0a94469e3?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1486870591958-9b977cd06d70?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1481833761820-05023b3fcc39?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1501785888041-af3ba6f06fd1?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1477322524744-0ae43c78411a?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1504280396440-4277716de714?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1475854833216-ba9792040e3a?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1475856083096-ed7d0d042617?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1487002073103-f3661129f123?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1476602052409-b6955a5ef0e8?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1469587422967-73b371490288?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1469587422967-73b371490288?q=80&w=2070&auto=format&fit=crop"
         ];
 
         let timer;
@@ -823,8 +853,9 @@
             const userLang = navigator.language.startsWith('ko') ? 'ko' : 'en';
             setLanguage(userLang);
 
-            const dayOfWeek = new Date().getDay();
-            document.body.style.backgroundImage = `url('${backgroundImages[dayOfWeek]}')`;
+            // 랜덤 이미지 선택
+            const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+            document.body.style.backgroundImage = `url('${backgroundImages[randomIndex]}')`;
 
             // 명상 시간 선택 버튼
             challengeButtons.addEventListener('click', e => {
