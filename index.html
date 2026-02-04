@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -67,24 +66,57 @@
             color: var(--text-color);
         }
 
+        .challenge-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .challenge-buttons button {
-            background-color: transparent;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
             border: 2px solid var(--secondary-color);
             color: var(--text-color);
-            padding: 12px 24px;
-            margin: 0 8px;
-            border-radius: 30px;
+            padding: 14px 28px;
+            margin: 0;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 400;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            box-shadow: 0 3px 10px rgba(163, 177, 138, 0.2);
+        }
+
+        .challenge-buttons button::before {
+            content: "🌿";
+            position: absolute;
+            left: 12px;
+            font-size: 18px;
+            opacity: 0;
+            transform: scale(0);
             transition: all 0.3s ease;
         }
 
-        .challenge-buttons button:hover, .challenge-buttons button.active {
-            background-color: var(--secondary-color);
+        .challenge-buttons button:hover {
+            background: linear-gradient(135deg, var(--secondary-color), #8FA877);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(163, 177, 138, 0.4);
+            border-color: var(--highlight-color);
+            padding-left: 38px;
+        }
+
+        .challenge-buttons button:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .challenge-buttons button.active {
+            background: linear-gradient(135deg, var(--secondary-color), #8FA877);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(163, 177, 138, 0.4);
         }
 
         .ready-container {
@@ -112,21 +144,48 @@
         }
 
         #reset-button, #start-meditation-button {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--highlight-color), #6B9968);
             color: white;
             border: none;
-            padding: 14px 32px;
+            padding: 16px 40px;
             margin-top: 20px;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
+            font-size: 17px;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 15px rgba(88, 129, 87, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #start-meditation-button::before {
+            content: "✨";
+            margin-right: 8px;
+            font-size: 18px;
+            display: inline-block;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+        }
+
+        #reset-button::before {
+            content: "🔄";
+            margin-right: 8px;
             font-size: 16px;
-            transition: all 0.3s ease;
         }
 
         #reset-button:hover, #start-meditation-button:hover {
-            background-color: #4A5A6A;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #6B9968, var(--highlight-color));
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(88, 129, 87, 0.4);
+        }
+
+        #reset-button:active, #start-meditation-button:active {
+            transform: translateY(-1px) scale(1.02);
         }
 
         #reset-button {
@@ -161,27 +220,320 @@
         }
 
         #breath-guide {
-            width: 150px;
-            height: 150px;
-            background-color: var(--highlight-color);
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #87CEEB, #5B9BD5);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px auto;
             color: white;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 500;
-            opacity: 0.9;
-            box-shadow: 0 0 20px rgba(90, 129, 87, 0.5);
-            transition: transform 4s ease-in-out;
+            opacity: 1;
+            box-shadow: 
+                0 0 0 8px rgba(135, 206, 235, 0.2),
+                0 0 0 16px rgba(135, 206, 235, 0.1),
+                0 0 0 36px rgba(135, 206, 235, 0.1),
+                0 10px 30px rgba(91, 155, 213, 0.3);
+            transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
             transform: scale(0.8);
+            position: relative;
+        }
+
+        #breath-guide::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+            top: 0;
+            left: 0;
+        }
+
+        #breath-guide::after {
+            content: '❤️';
+            position: absolute;
+            font-size: 24px;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            animation: heartbeat 2s ease-in-out infinite;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            25% { transform: translate(-50%, 0) scale(1.1); }
+            50% { transform: translate(-50%, 0) scale(1); }
+            75% { transform: translate(-50%, 0) scale(1.05); }
+        }
+
+        #breath-guide.breathing-in {
+            transform: scale(1.15);
+            box-shadow: 
+                0 0 0 12px rgba(135, 206, 235, 0.3),
+                0 0 0 24px rgba(135, 206, 235, 0.2),
+                0 0 0 36px rgba(135, 206, 235, 0.1),
+                0 15px 40px rgba(91, 155, 213, 0.4);
+        }
+
+        #breath-guide.breathing-hold {
+            background: linear-gradient(135deg, #FFB6C1, #FFC0CB);
+            box-shadow: 
+                0 0 0 10px rgba(255, 182, 193, 0.25),
+                0 0 0 20px rgba(255, 182, 193, 0.15),
+                0 0 0 30px rgba(255, 182, 193, 0.1),
+                0 12px 35px rgba(255, 192, 203, 0.35);
+            transition: background 2s ease-in-out, box-shadow 2s ease-in-out, transform 4s ease-in-out;
+        }
+
+        #breath-guide.breathing-out {
+            transform: scale(0.7);
+            background: linear-gradient(135deg, #87CEEB, #5B9BD5);
+            box-shadow: 
+                0 0 0 4px rgba(135, 206, 235, 0.15),
+                0 0 0 8px rgba(135, 206, 235, 0.1),
+                0 5px 15px rgba(91, 155, 213, 0.2);
+            transition: background 2s ease-in-out, box-shadow 2s ease-in-out, transform 4s ease-in-out;
+        }
+
+        #breath-text {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
         }
 
         .ready-message {
             font-size: 20px;
             color: var(--primary-color);
-            margin: 20px 0;
+            margin: 30px 0 20px 0;
+        }
+
+        #view-emotions-button {
+            margin: 20px auto 0;
+            padding: 12px 28px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(135deg, rgba(163, 177, 138, 0.2), rgba(88, 129, 87, 0.2));
+            color: var(--highlight-color);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(88, 129, 87, 0.15);
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #view-emotions-button::before {
+            content: "📝";
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        #view-emotions-button:hover {
+            background: linear-gradient(135deg, rgba(163, 177, 138, 0.35), rgba(88, 129, 87, 0.35));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(88, 129, 87, 0.25);
+        }
+
+        #view-emotions-button:active {
+            transform: translateY(0);
+        }
+
+        /* Emotion Input Modal Styles */
+        .emotion-input-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .emotion-input-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .emotion-input-modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content .modal-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .modal-content input[type="text"] {
+            width: calc(100% - 30px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-content input[type="text"]:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+        }
+
+        .modal-content button {
+            background-color: var(--highlight-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .modal-content button:hover {
+            background-color: #4A6E4A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .modal-content .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-color);
+            background: none;
+            border: none;
+            padding: 0;
+            width: auto;
+            line-height: 1;
+        }
+
+        .modal-content .close-button:hover {
+            color: var(--primary-color);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal-content .saved-message {
+            font-size: 16px;
+            color: var(--highlight-color);
+            margin-top: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-content .saved-message.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Emotion History Modal Styles */
+        .emotion-history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .emotion-history-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .history-modal-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .history-modal-content h2 {
+            font-size: 22px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .emotion-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .emotion-item {
+            background-color: rgba(163, 177, 138, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid var(--highlight-color);
+        }
+
+        .emotion-word {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .emotion-date {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .no-emotions {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+            padding: 20px;
         }
 
     </style>
@@ -198,12 +550,33 @@
                 <button data-duration="120">2분</button>
                 <button data-duration="180">3분</button>
             </div>
+            <button id="view-emotions-button">내 기록 보기</button>
             
             <!-- Ready screen with start button -->
             <div class="ready-container">
                 <div id="breath-guide"><span id="breath-text"></span></div>
                 <p class="ready-message">편안한 자세로 앉아 준비가 되면 시작하세요</p>
                 <button id="start-meditation-button">명상 시작</button>
+            </div>
+
+            <!-- Emotion Input Modal -->
+            <div id="emotion-input-modal" class="emotion-input-modal">
+                <div class="modal-content">
+                    <button class="close-button">&times;</button>
+                    <p class="modal-title">지금 기분이 어떠신가요?<br>한 단어로 적어보세요.</p>
+                    <input type="text" id="emotion-word-input" placeholder="예: 평온함,홀가분함,고요함,졸림...">
+                    <button id="save-emotion-button">저장하기</button>
+                    <p id="emotion-saved-message" class="saved-message">오늘의 감정이 저장되었습니다.</p>
+                </div>
+            </div>
+
+            <!-- Emotion History Modal -->
+            <div id="emotion-history-modal" class="emotion-history-modal">
+                <div class="history-modal-content">
+                    <button class="close-button" id="close-history-button">&times;</button>
+                    <h2>나의 명상 기록</h2>
+                    <ul id="emotion-list" class="emotion-list"></ul>
+                </div>
             </div>
 
             <!-- Timer screen -->
@@ -220,6 +593,7 @@
 
 
     <script>
+        // DOM 요소 가져오기
         const challengeButtons = document.querySelector('.challenge-buttons');
         const readyContainer = document.querySelector('.ready-container');
         const timerContainer = document.querySelector('.timer-container');
@@ -227,7 +601,6 @@
         const messageDisplay = document.getElementById('message');
         const resetButton = document.getElementById('reset-button');
         const startMeditationButton = document.getElementById('start-meditation-button');
-        
         const initialUI = document.querySelector('.container p');
         const h1 = document.querySelector('h1');
         const progressBar = document.getElementById('progress-bar');
@@ -235,74 +608,215 @@
         const breathGuide = document.getElementById('breath-guide');
         const breathText = document.getElementById('breath-text');
 
+        // 감정 입력 모달 관련 DOM 요소
+        const emotionInputModal = document.getElementById('emotion-input-modal');
+        const emotionPromptElement = document.querySelector('.modal-title'); // modal-title -> emotion-prompt
+        const emotionWordInput = document.getElementById('emotion-word-input');
+        const saveEmotionButton = document.getElementById('save-emotion-button');
+        const emotionSavedMessageElement = document.getElementById('emotion-saved-message'); // saved-message element
+        const closeEmotionInputButton = document.querySelector('#emotion-input-modal .close-button');
+
+        // 감정 기록 보기 모달 관련 DOM 요소
+        const viewEmotionsButton = document.getElementById('view-emotions-button');
+        const emotionHistoryModal = document.getElementById('emotion-history-modal');
+        const closeHistoryButton = document.getElementById('close-history-button');
+        const emotionList = document.getElementById('emotion-list');
+        const historyTitleElement = document.querySelector('#emotion-history-modal h2');
+
+        // 다국어 텍스트 데이터
         const languageData = {
             'ko': {
-                h1: '명상 챌린지',
+                h1: '숨, 쉼 - 명상 챌린지',
                 initialP: '잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간',
                 challengeButtons: ['1분', '2분', '3분'],
                 readyMessage: '편안한 자세로 앉아 준비가 되면 시작하세요',
+                breathingPatternText: '4:4:6 호흡',
                 startButton: '명상 시작',
                 messageInitial: '숨을 깊게 들이마시고, 천천히 내쉬세요.',
                 inhale: '들이쉬세요',
                 hold: '참으세요',
                 exhale: '내쉬세요',
                 messageFinish: '명상을 완료했습니다. 편안한 하루 보내세요.',
-                resetButton: '다시하기'
+                resetButton: '다시하기',
+                viewRecordsButton: '내 기록 보기',
+                emotionPrompt: '지금 기분이 어떠신가요?<br>한 단어로 적어보세요.',
+                emotionInputPlaceholder: '예: 평온함,홀가분함,고요함,졸림...', // <-- Updated placeholder
+                saveButtonText: '저장하기',
+                savedMessage: '오늘의 감정이 저장되었습니다.',
+                historyTitle: '나의 명상 기록',
+                noRecords: '아직 기록된 감정이 없습니다.'
             },
             'en': {
-                h1: 'Meditation Challenge',
+                h1: 'Breathe, Pause - Meditation Challenge',
                 initialP: 'Forget everything for a moment, and focus entirely on your breath.',
                 challengeButtons: ['1 min', '2 min', '3 min'],
                 readyMessage: 'Sit in a comfortable position and start when you are ready.',
+                breathingPatternText: '4:4:6 Breathing',
                 startButton: 'Start Meditation',
                 messageInitial: 'Breathe in deeply, and exhale slowly.',
                 inhale: 'Inhale',
                 hold: 'Hold',
                 exhale: 'Exhale',
                 messageFinish: 'Meditation complete. Have a peaceful day.',
-                resetButton: 'Reset'
+                resetButton: 'Reset',
+                viewRecordsButton: 'View My Records',
+                emotionPrompt: 'How are you feeling right now?<br>Describe it in one word.',
+                emotionInputPlaceholder: 'e.g., Calm, Refreshed, Sleepy...',
+                saveButtonText: 'Save',
+                savedMessage: 'Today\'s emotion has been saved.',
+                historyTitle: 'My Meditation Records',
+                noRecords: 'No emotions recorded yet.'
             }
         };
 
-        let currentLang = 'ko'; // Default language
+        let currentLang = 'ko'; // 기본 언어 설정
 
+        // --- 헬퍼 함수 정의 ---
+
+        // 언어 설정 함수
         function setLanguage(lang) {
             currentLang = lang;
             const texts = languageData[lang];
 
-            // Update static texts
-            document.querySelector('h1').textContent = texts.h1;
-            document.querySelector('.container p').textContent = texts.initialP;
-            document.getElementById('start-meditation-button').textContent = texts.startButton;
-            document.getElementById('reset-button').textContent = texts.resetButton;
+            // 정적 텍스트 업데이트
+            h1.textContent = texts.h1;
+            initialUI.textContent = texts.initialP;
+            startMeditationButton.textContent = texts.startButton;
+            resetButton.textContent = texts.resetButton;
+            viewEmotionsButton.textContent = texts.viewRecordsButton;
+            historyTitleElement.textContent = texts.historyTitle;
 
-            // Update challenge buttons
+            // 챌린지 버튼 텍스트 업데이트
             const challengeButtonsElements = document.querySelectorAll('.challenge-buttons button');
             challengeButtonsElements.forEach((button, index) => {
                 button.textContent = texts.challengeButtons[index];
             });
 
-            // Update dynamic messages
-            // These will be set when needed by other functions, but ensure initial state is correct
+            // 동적 메시지 업데이트 (필요시 다른 함수에서 설정)
             document.querySelector('.ready-message').textContent = texts.readyMessage;
+
+            // 감정 입력 모달 텍스트 업데이트
+            emotionPromptElement.innerHTML = texts.emotionPrompt; // br 태그를 위해 innerHTML 사용
+            emotionWordInput.placeholder = texts.emotionInputPlaceholder;
+            saveEmotionButton.textContent = texts.saveButtonText;
+            emotionSavedMessageElement.textContent = texts.savedMessage;
         }
 
+        // localStorage에 감정 단어를 저장하는 함수
+        function saveEmotionToLocalStorage(word) {
+            let emotions = JSON.parse(localStorage.getItem('meditationEmotions') || '[]');
+            const timestamp = new Date().toISOString();
+            emotions.push({ word, timestamp });
+            localStorage.setItem('meditationEmotions', JSON.stringify(emotions));
+            console.log("Saved emotions:", emotions); // 디버깅용
+        }
+
+        // 감정 입력 모달 표시 함수
+        function showEmotionInputModal() {
+            emotionWordInput.value = ''; // 입력 필드 초기화
+            emotionSavedMessageElement.classList.remove('active'); // 저장 메시지 숨기기
+            emotionInputModal.classList.add('active'); // 모달 활성화 (페이드인 효과)
+            
+            // 모달이 열리면 입력창에 포커스
+            setTimeout(() => {
+                emotionWordInput.focus();
+            }, 300);
+        }
+
+        // 감정 입력 모달 닫기 함수
+        function closeEmotionInputModal() {
+            emotionInputModal.classList.remove('active');
+            finishChallengeFinalSteps();
+        }
+
+        // 감정 저장 처리 함수 (저장 버튼 클릭 시)
+        function saveEmotion() {
+            const emotionWord = emotionWordInput.value.trim();
+            
+            if (emotionWord === '') {
+                alert('감정을 한 단어로 입력해주세요.'); // 추후 언어 데이터로 대체
+                return;
+            }
+
+            saveEmotionToLocalStorage(emotionWord);
+
+            emotionSavedMessageElement.classList.add('active'); // 저장 완료 메시지 표시
+            emotionWordInput.disabled = true; // 입력 비활성화
+            saveEmotionButton.disabled = true; // 버튼 비활성화
+
+            // 1.5초 후 모달 닫기 및 최종 단계 실행
+            setTimeout(() => {
+                emotionInputModal.classList.remove('active');
+                emotionWordInput.disabled = false; // 입력 활성화
+                saveEmotionButton.disabled = false; // 버튼 활성화
+                emotionSavedMessageElement.classList.remove('active'); // 저장 메시지 숨기기 (다음 번을 위해)
+                finishChallengeFinalSteps(); // 명상 완료 후 최종 단계 실행
+            }, 1500);
+        }
+
+        // 명상 완료 후 최종 단계 함수
+        function finishChallengeFinalSteps() {
+            messageDisplay.textContent = languageData[currentLang].messageFinish;
+            resetButton.style.display = 'block';
+            viewEmotionsButton.style.display = 'block'; // 기록 보기 버튼 다시 표시
+        }
+
+        // 감정 기록 목록 로드 및 표시 함수
+        function loadAndDisplayEmotions() {
+            const emotions = JSON.parse(localStorage.getItem('meditationEmotions') || '[]');
+            
+            emotionList.innerHTML = ''; // 기존 목록 초기화
+            
+            if (emotions.length === 0) {
+                emotionList.innerHTML = `<li class="no-emotions">${languageData[currentLang].noRecords}</li>`;
+            } else {
+                emotions.reverse().forEach(emotion => { // 최신 기록이 위로 오도록 역순 정렬
+                    const date = new Date(emotion.timestamp);
+                    const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    
+                    const li = document.createElement('li');
+                    li.className = 'emotion-item';
+                    li.innerHTML = `
+                        <div class="emotion-word">${emotion.word}</div>
+                        <div class="emotion-date">${formattedDate}</div>
+                    `;
+                    emotionList.appendChild(li);
+                });
+            }
+        }
+
+        // 감정 기록 모달 표시 함수
+        function showEmotionHistoryModal() {
+            loadAndDisplayEmotions(); // 기록을 로드하고 표시
+            emotionHistoryModal.classList.add('active');
+        }
+
+        // 감정 기록 모달 닫기 함수
+        function closeHistoryModal() {
+            emotionHistoryModal.classList.remove('active');
+        }
+
+
+        // --- 명상 타이머 로직 ---
+
         const backgroundImages = [
-            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop", // Sunday
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop", // Monday
-            "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2070&auto=format&fit=crop", // Tuesday
-            "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=2070&auto=format&fit=crop", // Wednesday
-            "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2175&auto=format&fit=crop", // Thursday
-            "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1974&auto=format&fit=crop", // Friday
-            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop"  // Saturday
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2175&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1974&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop"
         ];
 
         let timer;
         let totalSeconds = 0;
         let initialDuration = 0;
         let selectedDuration = 0;
-        let currentPhase = 'inhale'; // Track breathing phase
+        let currentPhase = 'inhale';
         let breathCycleTimeout;
+
+        // --- 이벤트 리스너 ---
 
         document.addEventListener('DOMContentLoaded', () => {
             const userLang = navigator.language.startsWith('ko') ? 'ko' : 'en';
@@ -310,76 +824,99 @@
 
             const dayOfWeek = new Date().getDay();
             document.body.style.backgroundImage = `url('${backgroundImages[dayOfWeek]}')`;
+
+            // 명상 시간 선택 버튼
+            challengeButtons.addEventListener('click', e => {
+                if (e.target.tagName === 'BUTTON') {
+                    selectedDuration = parseInt(e.target.dataset.duration, 10);
+                    showReadyScreen();
+                }
+            });
+
+            // 명상 시작 버튼
+            startMeditationButton.addEventListener('click', () => {
+                startChallenge(selectedDuration);
+            });
+
+            // 리셋 버튼
+            resetButton.addEventListener('click', () => {
+                resetChallenge();
+            });
+
+            // 전체 화면 버튼
+            fullscreenButton.addEventListener('click', () => {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            });
+
+            // 감정 저장 버튼
+            saveEmotionButton.addEventListener('click', saveEmotion);
+            // 감정 입력 모달 닫기 버튼
+            closeEmotionInputButton.addEventListener('click', closeEmotionInputModal);
+            // 감정 기록 보기 버튼
+            viewEmotionsButton.addEventListener('click', showEmotionHistoryModal);
+            // 감정 기록 모달 닫기 버튼
+            closeHistoryButton.addEventListener('click', closeHistoryModal);
+            
+            // Enter 키로도 저장 가능하도록
+            emotionWordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEmotion();
+                }
+            });
         });
 
-        challengeButtons.addEventListener('click', e => {
-            if (e.target.tagName === 'BUTTON') {
-                selectedDuration = parseInt(e.target.dataset.duration, 10);
-                showReadyScreen();
-            }
-        });
-
-        startMeditationButton.addEventListener('click', () => {
-            startChallenge(selectedDuration);
-        });
-
-        resetButton.addEventListener('click', () => {
-            resetChallenge();
-        });
-
-        fullscreenButton.addEventListener('click', () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            } else {
-                document.documentElement.requestFullscreen();
-            }
-        });
+        // --- UI 및 로직 함수 ---
 
         function showReadyScreen() {
-            // UI 업데이트
             challengeButtons.style.display = 'none';
             initialUI.style.display = 'none';
-            document.querySelector('h1').style.display = 'none';
+            h1.style.display = 'none';
+            viewEmotionsButton.style.display = 'none'; // 기록 보기 버튼도 숨기기
             readyContainer.style.display = 'block';
             
-            // Show preview breathing animation
             breathGuide.style.display = 'flex';
+            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold'); // 클래스 초기화
+            breathText.textContent = languageData[currentLang].breathingPatternText;
             
-            // Initial small animation
-            breathGuide.style.transform = 'scale(0.2)'; // Start very small
+            breathGuide.style.transform = 'scale(0.2)'; // 시작 시 아주 작게
             setTimeout(() => {
-                breathGuide.style.transform = 'scale(0.8)'; // Animate to initial breathing size
-            }, 50); // A small delay to ensure the initial transform is registered before the next one
+                breathGuide.style.transform = 'scale(0.8)'; // 초기 호흡 크기로 애니메이션
+            }, 50); // 아주 작은 딜레이 후 다음 transform이 등록되도록
 
-            // Start the actual breathing cycle after the initial animation
             setTimeout(() => {
                 startPreviewBreathAnimation();
-            }, 4000); // Match this with the CSS transition duration for transform
+            }, 4000); // CSS transition 시간과 일치
         }
 
         function startPreviewBreathAnimation() {
-            // Initial state for the cycle (the breathGuide will already be at scale(0.8) from showReadyScreen)
             breathText.textContent = languageData[currentLang].inhale;
             
             const previewCycle = () => {
-                // Inhale phase
                 breathText.textContent = languageData[currentLang].inhale;
-                breathGuide.style.transform = 'scale(1.2)';
+                breathGuide.classList.remove('breathing-out', 'breathing-hold');
+                breathGuide.classList.add('breathing-in');
+                breathGuide.style.transform = 'scale(1.15)'; // Inhale scale
                 
                 setTimeout(() => {
-                    // Hold phase
                     breathText.textContent = languageData[currentLang].hold;
-                }, 4000);
+                    breathGuide.classList.remove('breathing-in', 'breathing-out');
+                    breathGuide.classList.add('breathing-hold');
+                }, 4000); // 4초 후 Hold 시작
                 
                 setTimeout(() => {
-                    // Exhale phase
                     breathText.textContent = languageData[currentLang].exhale;
-                    breathGuide.style.transform = 'scale(0.8)';
-                }, 6000);
+                    breathGuide.classList.remove('breathing-in', 'breathing-hold');
+                    breathGuide.classList.add('breathing-out');
+                    breathGuide.style.transform = 'scale(0.7)'; // Exhale scale
+                }, 8000); // 8초 후 Exhale 시작
             };
             
             previewCycle();
-            breathCycleTimeout = setInterval(previewCycle, 12000);
+            breathCycleTimeout = setInterval(previewCycle, 14000); // 전체 주기 14초
         }
 
         function stopPreviewBreathAnimation() {
@@ -387,35 +924,35 @@
         }
 
         function startBreathGuideAnimation() {
-            // Reset and start fresh
-            breathGuide.style.transform = 'scale(0.8)';
+            breathGuide.style.transform = 'scale(0.8)'; // 초기 크기로 설정
+            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold'); // 클래스 초기화
             currentPhase = 'inhale';
             
             const breathCycle = () => {
-                // Inhale phase (4 seconds)
                 currentPhase = 'inhale';
                 breathText.textContent = languageData[currentLang].inhale;
-                breathGuide.style.transform = 'scale(1.2)';
+                breathGuide.classList.remove('breathing-out', 'breathing-hold');
+                breathGuide.classList.add('breathing-in');
+                breathGuide.style.transform = 'scale(1.15)';
                 
                 setTimeout(() => {
-                    // Hold phase (4 seconds)
                     currentPhase = 'hold';
                     breathText.textContent = languageData[currentLang].hold;
-                }, 4000);
+                    breathGuide.classList.remove('breathing-in', 'breathing-out');
+                    breathGuide.classList.add('breathing-hold');
+                }, 4000); // 4초 후 Hold 시작
                 
                 setTimeout(() => {
-                    // Exhale phase (6 seconds)
                     currentPhase = 'exhale';
                     breathText.textContent = languageData[currentLang].exhale;
-                    breathGuide.style.transform = 'scale(0.8)';
-                }, 6000);
+                    breathGuide.classList.remove('breathing-in', 'breathing-hold');
+                    breathGuide.classList.add('breathing-out');
+                    breathGuide.style.transform = 'scale(0.7)';
+                }, 8000); // 8초 후 Exhale 시작
             };
             
-            // Start immediately
             breathCycle();
-            
-            // Repeat every 10 seconds (4s inhale + 4s hold + 6s exhale)
-            breathCycleTimeout = setInterval(breathCycle, 12000);
+            breathCycleTimeout = setInterval(breathCycle, 14000); // 전체 주기 14초
         }
 
         function startChallenge(duration) {
@@ -424,13 +961,12 @@
             totalSeconds = duration;
             initialDuration = duration;
             
-            // UI 업데이트
             readyContainer.style.display = 'none';
             timerContainer.style.display = 'block';
             resetButton.style.display = 'none';
+            viewEmotionsButton.style.display = 'none'; // 기록 보기 버튼도 숨기기
             messageDisplay.textContent = languageData[currentLang].messageInitial;
 
-            // Start breath guide with fresh animation
             breathGuide.style.display = 'flex';
             startBreathGuideAnimation();
 
@@ -459,27 +995,32 @@
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
             breathGuide.style.display = 'none';
-            messageDisplay.textContent = languageData[currentLang].messageFinish;
-            resetButton.style.display = 'block';
+            
+            showEmotionInputModal(); // 감정 입력 모달 표시
         }
 
         function resetChallenge() {
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
             
-            // UI 초기화
             h1.textContent = languageData[currentLang].h1;
-            document.querySelector('h1').style.display = 'block';
-            challengeButtons.style.display = 'block';
+            h1.style.display = 'block'; // H1 다시 표시
+            challengeButtons.style.display = 'flex'; // 버튼 다시 표시 (CSS flex)
             initialUI.style.display = 'block';
+            viewEmotionsButton.style.display = 'block'; // 기록 보기 버튼 다시 표시
+
             readyContainer.style.display = 'none';
             timerContainer.style.display = 'none';
             resetButton.style.display = 'none';
             messageDisplay.textContent = '';
             progressBar.style.width = '0%';
             breathGuide.style.display = 'none';
-            breathGuide.style.transform = 'scale(1)';
+            breathGuide.style.transform = 'scale(1)'; // 초기 상태로 복원
             breathText.textContent = '';
+            
+            // 모달 초기화
+            emotionInputModal.classList.remove('active');
+            emotionHistoryModal.classList.remove('active');
         }
     </script>
 </body>
