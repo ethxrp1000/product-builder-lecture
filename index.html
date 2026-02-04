@@ -225,11 +225,34 @@
         let timer;
         let totalSeconds = 0;
         let initialDuration = 0;
+        let audioContextUnlocked = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             const dayOfWeek = new Date().getDay();
             document.body.style.backgroundImage = `url('${backgroundImages[dayOfWeek]}')`;
         });
+
+        // Unlock audio context on first user interaction
+        function unlockAudioContext() {
+            if (audioContextUnlocked) return;
+
+            const audio = new Audio(); // Create a dummy audio element
+            audio.volume = 0; // Mute it
+            audio.play()
+                .then(() => {
+                    audio.pause(); // Immediately pause it
+                    audioContextUnlocked = true;
+                    console.log('Audio context unlocked.');
+                })
+                .catch(error => {
+                    console.error('Failed to unlock audio context:', error);
+                });
+            document.removeEventListener('click', unlockAudioContext);
+            document.removeEventListener('touchstart', unlockAudioContext);
+        }
+
+        document.addEventListener('click', unlockAudioContext);
+        document.addEventListener('touchstart', unlockAudioContext);
 
         challengeButtons.addEventListener('click', e => {
             if (e.target.tagName === 'BUTTON') {
@@ -274,8 +297,8 @@
                     console.log('Sound played successfully!');
                 })
                 .catch(error => {
-                    console.error('Error playing sound:', error);
-                    alert('사운드 재생에 실패했습니다. 브라우저 정책으로 인해 자동 재생이 차단되었을 수 있습니다. 화면을 한 번 터치한 후 다시 시도해주세요.');
+                    console.error('Error playing sound in startChallenge:', error);
+                    // Removed alert as audio context should be unlocked by now
                 });
 
             updateTimerDisplay();
