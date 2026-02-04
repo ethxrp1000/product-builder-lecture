@@ -547,8 +547,8 @@
             <h1>명상 챌린지</h1>
             <p>잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간</p>
             <div class="challenge-buttons">
+                <button data-duration="30">30초</button>
                 <button data-duration="60">1분</button>
-                <button data-duration="120">2분</button>
                 <button data-duration="180">3분</button>
             </div>
             <button id="view-emotions-button">내 기록 보기</button>
@@ -629,7 +629,7 @@
             'ko': {
                 h1: '숨, 쉼 - 명상 챌린지',
                 initialP: '잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간',
-                challengeButtons: ['1분', '2분', '3분'],
+                challengeButtons: ['30초', '1분', '3분'],
                 readyMessage: '',
                 breathingPatternText: '4:4:6 호흡',
                 startButton: '명상 시작',
@@ -801,44 +801,60 @@
         // --- 명상 타이머 로직 ---
 
         const backgroundImages = [
-            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2175&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1974&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1414609245292-abf16f398f62?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1470770841028-ad23b72c69e2?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1465146344425-f0490e0c2912?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1490730141103-6fd1c0f04eb5?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1473859182333-8a39783f98c8?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1459262838948-33f7b6016944?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1475932822765-a864700d867c?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1483728645009-dd77395e263d?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1451187580459-490d969a3d3b?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1469854523086-dd00bc324bce?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1457460867824-00e998bb1261?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1502677271427-4c07c74d5507?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1504958172901-b65f3a0937a4?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1503756234588-48b0a94469e3?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1486870591958-9b977cd06d70?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1481833761820-05023b3fcc39?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1501785888041-af3ba6f06fd1?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1477322524744-0ae43c78411a?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1504280396440-4277716de714?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1475854833216-ba9792040e3a?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1475856083096-ed7d0d042617?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1487002073103-f3661129f123?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1476602052409-b6955a5ef0e8?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1469587422967-73b371490288?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1469587422967-73b371490288?q=80&w=2070&auto=format&fit=crop"
-        ];
+    // 숲과 자연
+    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2074&auto=format&fit=crop",
+    
+    // 산과 풍경
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+    
+    // 호수와 물
+    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=2073&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?q=80&w=2035&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
+    
+    // 일몰과 일출
+    "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?q=80&w=2076&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1506061620692-3d79f47c8d2e?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1472120435266-53107fd0c44a?q=80&w=2070&auto=format&fit=crop",
+    
+    // 별과 밤하늘 (초자연적)
+    "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2013&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?q=80&w=2076&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=2078&auto=format&fit=crop",
+    
+    // 안개와 구름
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1974&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2074&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1500622547-dc17e0f97752?q=80&w=2066&auto=format&fit=crop",
+    
+    // 바다와 해변
+    "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2026&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1484821582734-6c6c9f99a672?q=80&w=2053&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1480926965639-9b5f63a0817b?q=80&w=2070&auto=format&fit=crop",
+    
+    // 초원과 들판
+    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=2087&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1477322524744-0ae43c78411a?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1500099817043-86d46000d58f?q=80&w=2070&auto=format&fit=crop",
+    
+    // 오로라와 신비로운 풍경 (초자연적)
+    "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1512850183740-d74e180d7a3b?q=80&w=2070&auto=format&fit=crop"
+     ];
 
         let timer;
         let totalSeconds = 0;
@@ -1023,14 +1039,46 @@
             progressBar.style.width = `${progressPercentage}%`;
         }
 
+        // 효과음 재생 함수 추가
+        function playCompletionSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 은은한 종소리 효과
+            const playBell = (frequency, startTime, duration) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                // 부드러운 페이드 아웃
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + startTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
+                
+                oscillator.start(audioContext.currentTime + startTime);
+                oscillator.stop(audioContext.currentTime + startTime + duration);
+            };
+            
+            // 3개의 조화로운 음으로 구성된 종소리
+            playBell(523.25, 0, 2.5);    // C5
+            playBell(659.25, 0.1, 2.3);  // E5
+            playBell(783.99, 0.2, 2.0);  // G5
+        }
+        
         function finishChallenge() {
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
             breathGuide.style.display = 'none';
             
+            // 효과음 재생
+            playCompletionSound();
+            
             showEmotionInputModal(); // 감정 입력 모달 표시
         }
-
         function resetChallenge() {
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
