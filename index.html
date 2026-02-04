@@ -217,6 +217,19 @@
             font-size: 24px;
             cursor: pointer;
             color: var(--primary-color);
+            padding: 10px;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        #fullscreen-button:active {
+            transform: scale(0.95);
+            opacity: 0.7;
         }
 
         #breath-guide {
@@ -311,7 +324,7 @@
             font-size: 20px;
             color: var(--primary-color);
             margin: 30px 0 20px 0;
-            word-break: keep-all; /* 모바일에서 한국어 줄바꿈 개선 */
+            word-break: keep-all;
         }
 
         #view-emotions-button {
@@ -347,7 +360,6 @@
             transform: translateY(0);
         }
 
-        /* Emotion Input Modal Styles */
         .emotion-input-modal {
             position: fixed;
             top: 0;
@@ -462,7 +474,6 @@
             visibility: visible;
         }
 
-        /* Emotion History Modal Styles */
         .emotion-history-modal {
             position: fixed;
             top: 0;
@@ -553,14 +564,12 @@
             </div>
             <button id="view-emotions-button">내 기록 보기</button>
             
-            <!-- Ready screen with start button -->
             <div class="ready-container">
                 <div id="breath-guide"><span id="breath-text"></span></div>
                 <p class="ready-message"></p>
                 <button id="start-meditation-button">명상 시작</button>
             </div>
 
-            <!-- Emotion Input Modal -->
             <div id="emotion-input-modal" class="emotion-input-modal">
                 <div class="modal-content">
                     <button class="close-button">&times;</button>
@@ -571,7 +580,6 @@
                 </div>
             </div>
 
-            <!-- Emotion History Modal -->
             <div id="emotion-history-modal" class="emotion-history-modal">
                 <div class="history-modal-content">
                     <button class="close-button" id="close-history-button">&times;</button>
@@ -580,7 +588,6 @@
                 </div>
             </div>
 
-            <!-- Timer screen -->
             <div class="timer-container">
                 <div id="timer">00:00</div>
                 <div id="progress-bar-container">
@@ -609,22 +616,19 @@
         const breathGuide = document.getElementById('breath-guide');
         const breathText = document.getElementById('breath-text');
 
-        // 감정 입력 모달 관련 DOM 요소
         const emotionInputModal = document.getElementById('emotion-input-modal');
-        const emotionPromptElement = document.querySelector('.modal-title'); // modal-title -> emotion-prompt
+        const emotionPromptElement = document.querySelector('.modal-title');
         const emotionWordInput = document.getElementById('emotion-word-input');
         const saveEmotionButton = document.getElementById('save-emotion-button');
-        const emotionSavedMessageElement = document.getElementById('emotion-saved-message'); // saved-message element
+        const emotionSavedMessageElement = document.getElementById('emotion-saved-message');
         const closeEmotionInputButton = document.querySelector('#emotion-input-modal .close-button');
 
-        // 감정 기록 보기 모달 관련 DOM 요소
         const viewEmotionsButton = document.getElementById('view-emotions-button');
         const emotionHistoryModal = document.getElementById('emotion-history-modal');
         const closeHistoryButton = document.getElementById('close-history-button');
         const emotionList = document.getElementById('emotion-list');
         const historyTitleElement = document.querySelector('#emotion-history-modal h2');
 
-        // 다국어 텍스트 데이터
         const languageData = {
             'ko': {
                 h1: '숨, 쉼 - 명상 챌린지',
@@ -641,7 +645,7 @@
                 resetButton: '다시하기',
                 viewRecordsButton: '내 기록 보기',
                 emotionPrompt: '지금 기분이 어떠신가요?<br>한 단어로 적어보세요.',
-                emotionInputPlaceholder: '예: 평온함,홀가분함,고요함,졸림...', // <-- Updated placeholder
+                emotionInputPlaceholder: '예: 평온함,홀가분함,고요함,졸림...',
                 saveButtonText: '저장하기',
                 savedMessage: '오늘의 감정이 저장되었습니다.',
                 historyTitle: '나의 명상 기록',
@@ -670,16 +674,46 @@
             }
         };
 
-        let currentLang = 'ko'; // 기본 언어 설정
+        let currentLang = 'ko';
 
         // --- 헬퍼 함수 정의 ---
 
-        // 언어 설정 함수
+        // 효과음 재생 함수
+        function playCompletionSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                const playBell = (frequency, startTime, duration) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + startTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
+                    
+                    oscillator.start(audioContext.currentTime + startTime);
+                    oscillator.stop(audioContext.currentTime + startTime + duration);
+                };
+                
+                playBell(523.25, 0, 2.5);
+                playBell(659.25, 0.1, 2.3);
+                playBell(783.99, 0.2, 2.0);
+                
+            } catch (error) {
+                console.log('효과음 재생 실패:', error);
+            }
+        }
+
         function setLanguage(lang) {
             currentLang = lang;
             const texts = languageData[lang];
 
-            // 정적 텍스트 업데이트
             h1.textContent = texts.h1;
             initialUI.textContent = texts.initialP;
             startMeditationButton.textContent = texts.startButton;
@@ -687,91 +721,80 @@
             viewEmotionsButton.textContent = texts.viewRecordsButton;
             historyTitleElement.textContent = texts.historyTitle;
 
-            // 챌린지 버튼 텍스트 업데이트
             const challengeButtonsElements = document.querySelectorAll('.challenge-buttons button');
             challengeButtonsElements.forEach((button, index) => {
                 button.textContent = texts.challengeButtons[index];
             });
 
-            // 동적 메시지 업데이트 (필요시 다른 함수에서 설정)
             document.querySelector('.ready-message').textContent = texts.readyMessage;
 
-            // 감정 입력 모달 텍스트 업데이트
-            emotionPromptElement.innerHTML = ''; // 질문 문구 제거
+            emotionPromptElement.innerHTML = texts.emotionPrompt;
             emotionWordInput.placeholder = texts.emotionInputPlaceholder;
             saveEmotionButton.textContent = texts.saveButtonText;
             emotionSavedMessageElement.textContent = texts.savedMessage;
         }
 
-        // localStorage에 감정 단어를 저장하는 함수
         function saveEmotionToLocalStorage(word) {
             let emotions = JSON.parse(localStorage.getItem('meditationEmotions') || '[]');
             const timestamp = new Date().toISOString();
             emotions.push({ word, timestamp });
             localStorage.setItem('meditationEmotions', JSON.stringify(emotions));
-            console.log("Saved emotions:", emotions); // 디버깅용
+            console.log("Saved emotions:", emotions);
         }
 
-        // 감정 입력 모달 표시 함수
         function showEmotionInputModal() {
-            emotionWordInput.value = ''; // 입력 필드 초기화
-            emotionSavedMessageElement.classList.remove('active'); // 저장 메시지 숨기기
-            emotionInputModal.classList.add('active'); // 모달 활성화 (페이드인 효과)
+            emotionWordInput.value = '';
+            emotionSavedMessageElement.classList.remove('active');
+            emotionInputModal.classList.add('active');
             
-            // 모달이 열리면 입력창에 포커스
             setTimeout(() => {
                 emotionWordInput.focus();
             }, 300);
         }
 
-        // 감정 입력 모달 닫기 함수
         function closeEmotionInputModal() {
             emotionInputModal.classList.remove('active');
             finishChallengeFinalSteps();
         }
 
-        // 감정 저장 처리 함수 (저장 버튼 클릭 시)
         function saveEmotion() {
             const emotionWord = emotionWordInput.value.trim();
             
             if (emotionWord === '') {
-                alert('감정을 한 단어로 입력해주세요.'); // 추후 언어 데이터로 대체
+                alert('감정을 한 단어로 입력해주세요.');
                 return;
             }
 
             saveEmotionToLocalStorage(emotionWord);
 
-            emotionSavedMessageElement.classList.add('active'); // 저장 완료 메시지 표시
-            emotionWordInput.disabled = true; // 입력 비활성화
-            saveEmotionButton.disabled = true; // 버튼 비활성화
+            emotionSavedMessageElement.classList.add('active');
+            emotionWordInput.disabled = true;
+            saveEmotionButton.disabled = true;
 
-            // 1.5초 후 모달 닫기 및 최종 단계 실행
             setTimeout(() => {
                 emotionInputModal.classList.remove('active');
-                emotionWordInput.disabled = false; // 입력 활성화
-                saveEmotionButton.disabled = false; // 버튼 활성화
-                emotionSavedMessageElement.classList.remove('active'); // 저장 메시지 숨기기 (다음 번을 위해)
-                finishChallengeFinalSteps(); // 명상 완료 후 최종 단계 실행
+                emotionWordInput.disabled = false;
+                saveEmotionButton.disabled = false;
+                emotionSavedMessageElement.classList.remove('active');
+                finishChallengeFinalSteps();
             }, 1500);
         }
 
-        // 명상 완료 후 최종 단계 함수
         function finishChallengeFinalSteps() {
             messageDisplay.textContent = languageData[currentLang].messageFinish;
             resetButton.style.display = 'block';
-            viewEmotionsButton.style.display = 'block'; // 기록 보기 버튼 다시 표시
+            viewEmotionsButton.style.display = 'block';
         }
 
-        // 감정 기록 목록 로드 및 표시 함수
         function loadAndDisplayEmotions() {
             const emotions = JSON.parse(localStorage.getItem('meditationEmotions') || '[]');
             
-            emotionList.innerHTML = ''; // 기존 목록 초기화
+            emotionList.innerHTML = '';
             
             if (emotions.length === 0) {
                 emotionList.innerHTML = `<li class="no-emotions">${languageData[currentLang].noRecords}</li>`;
             } else {
-                emotions.reverse().forEach(emotion => { // 최신 기록이 위로 오도록 역순 정렬
+                emotions.reverse().forEach(emotion => {
                     const date = new Date(emotion.timestamp);
                     const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
                     
@@ -786,77 +809,73 @@
             }
         }
 
-        // 감정 기록 모달 표시 함수
         function showEmotionHistoryModal() {
-            loadAndDisplayEmotions(); // 기록을 로드하고 표시
+            loadAndDisplayEmotions();
             emotionHistoryModal.classList.add('active');
         }
 
-        // 감정 기록 모달 닫기 함수
         function closeHistoryModal() {
             emotionHistoryModal.classList.remove('active');
         }
 
-
-        // --- 명상 타이머 로직 ---
-
         const backgroundImages = [
-    // 숲과 자연
-    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2074&auto=format&fit=crop",
-    
-    // 산과 풍경
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
-    
-    // 호수와 물
-    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=2073&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?q=80&w=2035&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
-    
-    // 일몰과 일출
-    "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?q=80&w=2076&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1506061620692-3d79f47c8d2e?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1472120435266-53107fd0c44a?q=80&w=2070&auto=format&fit=crop",
-    
-    // 별과 밤하늘 (초자연적)
-    "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2013&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?q=80&w=2076&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=2078&auto=format&fit=crop",
-    
-    // 안개와 구름
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1974&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2074&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1500622547-dc17e0f97752?q=80&w=2066&auto=format&fit=crop",
-    
-    // 바다와 해변
-    "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2026&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1484821582734-6c6c9f99a672?q=80&w=2053&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1480926965639-9b5f63a0817b?q=80&w=2070&auto=format&fit=crop",
-    
-    // 초원과 들판
-    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=2087&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1477322524744-0ae43c78411a?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1500099817043-86d46000d58f?q=80&w=2070&auto=format&fit=crop",
-    
-    // 오로라와 신비로운 풍경 (초자연적)
-    "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1512850183740-d74e180d7a3b?q=80&w=2070&auto=format&fit=crop"
-     ];
-
-        let timer;
+            // 숲과 자연
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2074&auto=format&fit=crop",
+            
+            // 산과 풍경
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+            
+            // 호수와 물
+            "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=2073&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?q=80&w=2035&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop",
+            
+            // 일몰과 일출
+            "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?q=80&w=2076&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1506061620692-3d79f47c8d2e?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1472120435266-53107fd0c44a?q=80&w=2070&auto=format&fit=crop",
+            
+            // 별과 밤하늘
+            "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2013&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?q=80&w=2076&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=2078&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1974&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2026&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1484821582734-6c6c9f99a672?q=80&w=2053&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1480926965639-9b5f63a0817b?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=2087&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1506929562872-bb421503ef21?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1511576661531-b34d7da5d0bb?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1475113548554-5a36f1f523d6?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1545389336-cf090694435e?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2070&auto=format&fit=crop",
+                                    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2070&auto=format&fit=crop",
+                                    "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
+                                    "https://images.unsplash.com/photo-1534430480872-3498386e7856?q=80&w=2070&auto=format&fit=crop",
+                                    "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?q=80&w=2070&auto=format&fit=crop",
+                                    "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2070&auto=format&fit=crop",
+                        
+                        
+                                ];        let timer;
         let totalSeconds = 0;
         let initialDuration = 0;
         let selectedDuration = 0;
@@ -869,11 +888,9 @@
             const userLang = navigator.language.startsWith('ko') ? 'ko' : 'en';
             setLanguage(userLang);
 
-            // 랜덤 이미지 선택
             const randomIndex = Math.floor(Math.random() * backgroundImages.length);
             document.body.style.backgroundImage = `url('${backgroundImages[randomIndex]}')`;
 
-            // 명상 시간 선택 버튼
             challengeButtons.addEventListener('click', e => {
                 if (e.target.tagName === 'BUTTON') {
                     selectedDuration = parseInt(e.target.dataset.duration, 10);
@@ -881,35 +898,44 @@
                 }
             });
 
-            // 명상 시작 버튼
             startMeditationButton.addEventListener('click', () => {
                 startChallenge(selectedDuration);
             });
 
-            // 리셋 버튼
             resetButton.addEventListener('click', () => {
                 resetChallenge();
             });
 
-            // 전체 화면 버튼
-            fullscreenButton.addEventListener('click', () => {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                } else {
-                    document.documentElement.requestFullscreen();
+            fullscreenButton.addEventListener('click', async () => {
+                try {
+                    if (document.fullscreenElement || document.webkitFullscreenElement) {
+                        if (document.exitFullscreen) {
+                            await document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            await document.webkitExitFullscreen();
+                        }
+                    } else {
+                        const elem = document.documentElement;
+                        if (elem.requestFullscreen) {
+                            await elem.requestFullscreen();
+                        } else if (elem.webkitRequestFullscreen) {
+                            await elem.webkitRequestFullscreen();
+                        } else if (elem.mozRequestFullScreen) {
+                            await elem.mozRequestFullScreen();
+                        } else if (elem.msRequestFullscreen) {
+                            await elem.msRequestFullscreen();
+                        }
+                    }
+                } catch (error) {
+                    console.log('전체화면 모드를 사용할 수 없습니다:', error);
                 }
             });
 
-            // 감정 저장 버튼
             saveEmotionButton.addEventListener('click', saveEmotion);
-            // 감정 입력 모달 닫기 버튼
             closeEmotionInputButton.addEventListener('click', closeEmotionInputModal);
-            // 감정 기록 보기 버튼
             viewEmotionsButton.addEventListener('click', showEmotionHistoryModal);
-            // 감정 기록 모달 닫기 버튼
             closeHistoryButton.addEventListener('click', closeHistoryModal);
             
-            // Enter 키로도 저장 가능하도록
             emotionWordInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     saveEmotion();
@@ -923,21 +949,21 @@
             challengeButtons.style.display = 'none';
             initialUI.style.display = 'none';
             h1.style.display = 'none';
-            viewEmotionsButton.style.display = 'none'; // 기록 보기 버튼도 숨기기
+            viewEmotionsButton.style.display = 'none';
             readyContainer.style.display = 'block';
             
             breathGuide.style.display = 'flex';
-            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold'); // 클래스 초기화
+            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold');
             breathText.textContent = languageData[currentLang].breathingPatternText;
             
-            breathGuide.style.transform = 'scale(0.2)'; // 시작 시 아주 작게
+            breathGuide.style.transform = 'scale(0.2)';
             setTimeout(() => {
-                breathGuide.style.transform = 'scale(0.8)'; // 초기 호흡 크기로 애니메이션
-            }, 50); // 아주 작은 딜레이 후 다음 transform이 등록되도록
+                breathGuide.style.transform = 'scale(0.8)';
+            }, 50);
 
             setTimeout(() => {
                 startPreviewBreathAnimation();
-            }, 4000); // CSS transition 시간과 일치
+            }, 4000);
         }
 
         function startPreviewBreathAnimation() {
@@ -947,24 +973,24 @@
                 breathText.textContent = languageData[currentLang].inhale;
                 breathGuide.classList.remove('breathing-out', 'breathing-hold');
                 breathGuide.classList.add('breathing-in');
-                breathGuide.style.transform = 'scale(1.15)'; // Inhale scale
+                breathGuide.style.transform = 'scale(1.15)';
                 
                 setTimeout(() => {
                     breathText.textContent = languageData[currentLang].hold;
                     breathGuide.classList.remove('breathing-in', 'breathing-out');
                     breathGuide.classList.add('breathing-hold');
-                }, 4000); // 4초 후 Hold 시작
+                }, 4000);
                 
                 setTimeout(() => {
                     breathText.textContent = languageData[currentLang].exhale;
                     breathGuide.classList.remove('breathing-in', 'breathing-hold');
                     breathGuide.classList.add('breathing-out');
-                    breathGuide.style.transform = 'scale(0.7)'; // Exhale scale
-                }, 8000); // 8초 후 Exhale 시작
+                    breathGuide.style.transform = 'scale(0.7)';
+                }, 8000);
             };
             
             previewCycle();
-            breathCycleTimeout = setInterval(previewCycle, 14000); // 전체 주기 14초
+            breathCycleTimeout = setInterval(previewCycle, 14000);
         }
 
         function stopPreviewBreathAnimation() {
@@ -972,8 +998,8 @@
         }
 
         function startBreathGuideAnimation() {
-            breathGuide.style.transform = 'scale(0.8)'; // 초기 크기로 설정
-            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold'); // 클래스 초기화
+            breathGuide.style.transform = 'scale(0.8)';
+            breathGuide.classList.remove('breathing-in', 'breathing-out', 'breathing-hold');
             currentPhase = 'inhale';
             
             const breathCycle = () => {
@@ -988,7 +1014,7 @@
                     breathText.textContent = languageData[currentLang].hold;
                     breathGuide.classList.remove('breathing-in', 'breathing-out');
                     breathGuide.classList.add('breathing-hold');
-                }, 4000); // 4초 후 Hold 시작
+                }, 4000);
                 
                 setTimeout(() => {
                     currentPhase = 'exhale';
@@ -996,11 +1022,11 @@
                     breathGuide.classList.remove('breathing-in', 'breathing-hold');
                     breathGuide.classList.add('breathing-out');
                     breathGuide.style.transform = 'scale(0.7)';
-                }, 8000); // 8초 후 Exhale 시작
+                }, 8000);
             };
             
             breathCycle();
-            breathCycleTimeout = setInterval(breathCycle, 14000); // 전체 주기 14초
+            breathCycleTimeout = setInterval(breathCycle, 14000);
         }
 
         function startChallenge(duration) {
@@ -1012,7 +1038,7 @@
             readyContainer.style.display = 'none';
             timerContainer.style.display = 'block';
             resetButton.style.display = 'none';
-            viewEmotionsButton.style.display = 'none'; // 기록 보기 버튼도 숨기기
+            viewEmotionsButton.style.display = 'none';
             messageDisplay.textContent = languageData[currentLang].messageInitial;
 
             breathGuide.style.display = 'flex';
@@ -1039,55 +1065,25 @@
             progressBar.style.width = `${progressPercentage}%`;
         }
 
-        // 효과음 재생 함수 추가
-        function playCompletionSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // 은은한 종소리 효과
-            const playBell = (frequency, startTime, duration) => {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = frequency;
-                oscillator.type = 'sine';
-                
-                // 부드러운 페이드 아웃
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
-                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + startTime + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
-                
-                oscillator.start(audioContext.currentTime + startTime);
-                oscillator.stop(audioContext.currentTime + startTime + duration);
-            };
-            
-            // 3개의 조화로운 음으로 구성된 종소리
-            playBell(523.25, 0, 2.5);    // C5
-            playBell(659.25, 0.1, 2.3);  // E5
-            playBell(783.99, 0.2, 2.0);  // G5
-        }
-        
         function finishChallenge() {
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
             breathGuide.style.display = 'none';
             
-            // 효과음 재생
             playCompletionSound();
             
-            showEmotionInputModal(); // 감정 입력 모달 표시
+            showEmotionInputModal();
         }
+
         function resetChallenge() {
             clearInterval(timer);
             clearInterval(breathCycleTimeout);
             
             h1.textContent = languageData[currentLang].h1;
-            h1.style.display = 'block'; // H1 다시 표시
-            challengeButtons.style.display = 'flex'; // 버튼 다시 표시 (CSS flex)
+            h1.style.display = 'block';
+            challengeButtons.style.display = 'flex';
             initialUI.style.display = 'block';
-            viewEmotionsButton.style.display = 'block'; // 기록 보기 버튼 다시 표시
+            viewEmotionsButton.style.display = 'block';
 
             readyContainer.style.display = 'none';
             timerContainer.style.display = 'none';
@@ -1095,10 +1091,9 @@
             messageDisplay.textContent = '';
             progressBar.style.width = '0%';
             breathGuide.style.display = 'none';
-            breathGuide.style.transform = 'scale(1)'; // 초기 상태로 복원
+            breathGuide.style.transform = 'scale(1)';
             breathText.textContent = '';
             
-            // 모달 초기화
             emotionInputModal.classList.remove('active');
             emotionHistoryModal.classList.remove('active');
         }
