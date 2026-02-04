@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -86,6 +87,11 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
+        .ready-container {
+            margin-top: 30px;
+            display: none;
+        }
+
         .timer-container {
             margin-top: 30px;
             display: none;
@@ -105,21 +111,26 @@
             min-height: 27px;
         }
 
-        #reset-button {
-            display: none;
+        #reset-button, #start-meditation-button {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 32px;
             margin-top: 20px;
             border-radius: 30px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        #reset-button:hover {
+        #reset-button:hover, #start-meditation-button:hover {
             background-color: #4A5A6A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        #reset-button {
+            display: none;
         }
 
         #progress-bar-container {
@@ -149,6 +160,30 @@
             color: var(--primary-color);
         }
 
+        #breath-guide {
+            width: 150px;
+            height: 150px;
+            background-color: var(--highlight-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            color: white;
+            font-size: 24px;
+            font-weight: 500;
+            opacity: 0.9;
+            box-shadow: 0 0 20px rgba(90, 129, 87, 0.5);
+            transition: transform 4s ease-in-out;
+            transform: scale(0.8);
+        }
+
+        .ready-message {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+
     </style>
 </head>
 <body>
@@ -162,8 +197,16 @@
                 <button data-duration="60">1분</button>
                 <button data-duration="120">2분</button>
                 <button data-duration="180">3분</button>
-                <button data-duration="300">5분</button>
             </div>
+            
+            <!-- Ready screen with start button -->
+            <div class="ready-container">
+                <div id="breath-guide"><span id="breath-text"></span></div>
+                <p class="ready-message">편안한 자세로 앉아 준비가 되면 시작하세요</p>
+                <button id="start-meditation-button">명상 시작</button>
+            </div>
+
+            <!-- Timer screen -->
             <div class="timer-container">
                 <div id="timer">00:00</div>
                 <div id="progress-bar-container">
@@ -175,42 +218,74 @@
         </div>
     </div>
 
-    <audio id="nature-sound" loop src="https://cdn.pixabay.com/audio/2022/10/18/audio_83a15dc289.mp3"></audio>
 
     <script>
         const challengeButtons = document.querySelector('.challenge-buttons');
+        const readyContainer = document.querySelector('.ready-container');
         const timerContainer = document.querySelector('.timer-container');
         const timerDisplay = document.getElementById('timer');
         const messageDisplay = document.getElementById('message');
         const resetButton = document.getElementById('reset-button');
-        const natureSound = document.getElementById('nature-sound');
+        const startMeditationButton = document.getElementById('start-meditation-button');
+        
         const initialUI = document.querySelector('.container p');
         const h1 = document.querySelector('h1');
         const progressBar = document.getElementById('progress-bar');
         const fullscreenButton = document.getElementById('fullscreen-button');
+        const breathGuide = document.getElementById('breath-guide');
+        const breathText = document.getElementById('breath-text');
 
-        const natureSounds = [
-            "https://assets.mixkit.co/sfx/preview/mixkit-forest-at-night-1233.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-summer-night-crickets-and-wind-1229.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-jungle-atmosphere-with-insects-and-birds-2413.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-light-rain-and-crickets-1240.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-rain-and-thunder-in-the-forest-1254.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-calm-river-in-the-jungle-1252.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-waterfall-in-a-cave-1223.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-waves-coming-to-the-shore-1260.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-gentle-ocean-waves-1129.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-wind-in-the-trees-1174.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-strong-wind-whistle-1205.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-birds-singing-in-the-forest-1234.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-singing-birds-in-the-morning-1232.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-owl-hooting-in-the-forest-2480.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-wolf-howling-in-the-night-1219.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-crickets-chirping-in-the-night-1243.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-cicadas-in-a-field-2407.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-frogs-croaking-in-a-pond-1231.mp3",
-            "https://assets.mixkit.co/sfx/preview/mixkit-bees-buzzing-in-a-meadow-2482.mp3"
-        ];
+        const languageData = {
+            'ko': {
+                h1: '명상 챌린지',
+                initialP: '잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간',
+                challengeButtons: ['1분', '2분', '3분'],
+                readyMessage: '편안한 자세로 앉아 준비가 되면 시작하세요',
+                startButton: '명상 시작',
+                messageInitial: '숨을 깊게 들이마시고, 천천히 내쉬세요.',
+                inhale: '들이쉬세요',
+                hold: '참으세요',
+                exhale: '내쉬세요',
+                messageFinish: '명상을 완료했습니다. 편안한 하루 보내세요.',
+                resetButton: '다시하기'
+            },
+            'en': {
+                h1: 'Meditation Challenge',
+                initialP: 'Forget everything for a moment, and focus entirely on your breath.',
+                challengeButtons: ['1 min', '2 min', '3 min'],
+                readyMessage: 'Sit in a comfortable position and start when you are ready.',
+                startButton: 'Start Meditation',
+                messageInitial: 'Breathe in deeply, and exhale slowly.',
+                inhale: 'Inhale',
+                hold: 'Hold',
+                exhale: 'Exhale',
+                messageFinish: 'Meditation complete. Have a peaceful day.',
+                resetButton: 'Reset'
+            }
+        };
+
+        let currentLang = 'ko'; // Default language
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const texts = languageData[lang];
+
+            // Update static texts
+            document.querySelector('h1').textContent = texts.h1;
+            document.querySelector('.container p').textContent = texts.initialP;
+            document.getElementById('start-meditation-button').textContent = texts.startButton;
+            document.getElementById('reset-button').textContent = texts.resetButton;
+
+            // Update challenge buttons
+            const challengeButtonsElements = document.querySelectorAll('.challenge-buttons button');
+            challengeButtonsElements.forEach((button, index) => {
+                button.textContent = texts.challengeButtons[index];
+            });
+
+            // Update dynamic messages
+            // These will be set when needed by other functions, but ensure initial state is correct
+            document.querySelector('.ready-message').textContent = texts.readyMessage;
+        }
 
         const backgroundImages = [
             "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop", // Sunday
@@ -225,40 +300,27 @@
         let timer;
         let totalSeconds = 0;
         let initialDuration = 0;
-        let audioContextUnlocked = false;
+        let selectedDuration = 0;
+        let currentPhase = 'inhale'; // Track breathing phase
+        let breathCycleTimeout;
 
         document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language.startsWith('ko') ? 'ko' : 'en';
+            setLanguage(userLang);
+
             const dayOfWeek = new Date().getDay();
             document.body.style.backgroundImage = `url('${backgroundImages[dayOfWeek]}')`;
         });
 
-        // Unlock audio context on first user interaction
-        function unlockAudioContext() {
-            if (audioContextUnlocked) return;
-
-            const audio = new Audio(); // Create a dummy audio element
-            audio.volume = 0; // Mute it
-            audio.play()
-                .then(() => {
-                    audio.pause(); // Immediately pause it
-                    audioContextUnlocked = true;
-                    console.log('Audio context unlocked.');
-                })
-                .catch(error => {
-                    console.error('Failed to unlock audio context:', error);
-                });
-            document.removeEventListener('click', unlockAudioContext);
-            document.removeEventListener('touchstart', unlockAudioContext);
-        }
-
-        document.addEventListener('click', unlockAudioContext);
-        document.addEventListener('touchstart', unlockAudioContext);
-
         challengeButtons.addEventListener('click', e => {
             if (e.target.tagName === 'BUTTON') {
-                const duration = parseInt(e.target.dataset.duration, 10);
-                startChallenge(duration, e.target);
+                selectedDuration = parseInt(e.target.dataset.duration, 10);
+                showReadyScreen();
             }
+        });
+
+        startMeditationButton.addEventListener('click', () => {
+            startChallenge(selectedDuration);
         });
 
         resetButton.addEventListener('click', () => {
@@ -273,33 +335,104 @@
             }
         });
 
-        function startChallenge(duration, activeButton) {
-            console.log('startChallenge called with duration:', duration);
+        function showReadyScreen() {
+            // UI 업데이트
+            challengeButtons.style.display = 'none';
+            initialUI.style.display = 'none';
+            document.querySelector('h1').style.display = 'none';
+            readyContainer.style.display = 'block';
+            
+            // Show preview breathing animation
+            breathGuide.style.display = 'flex';
+            
+            // Initial small animation
+            breathGuide.style.transform = 'scale(0.2)'; // Start very small
+            setTimeout(() => {
+                breathGuide.style.transform = 'scale(0.8)'; // Animate to initial breathing size
+            }, 50); // A small delay to ensure the initial transform is registered before the next one
+
+            // Start the actual breathing cycle after the initial animation
+            setTimeout(() => {
+                startPreviewBreathAnimation();
+            }, 4000); // Match this with the CSS transition duration for transform
+        }
+
+        function startPreviewBreathAnimation() {
+            // Initial state for the cycle (the breathGuide will already be at scale(0.8) from showReadyScreen)
+            breathText.textContent = languageData[currentLang].inhale;
+            
+            const previewCycle = () => {
+                // Inhale phase
+                breathText.textContent = languageData[currentLang].inhale;
+                breathGuide.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    // Hold phase
+                    breathText.textContent = languageData[currentLang].hold;
+                }, 4000);
+                
+                setTimeout(() => {
+                    // Exhale phase
+                    breathText.textContent = languageData[currentLang].exhale;
+                    breathGuide.style.transform = 'scale(0.8)';
+                }, 6000);
+            };
+            
+            previewCycle();
+            breathCycleTimeout = setInterval(previewCycle, 12000);
+        }
+
+        function stopPreviewBreathAnimation() {
+            clearInterval(breathCycleTimeout);
+        }
+
+        function startBreathGuideAnimation() {
+            // Reset and start fresh
+            breathGuide.style.transform = 'scale(0.8)';
+            currentPhase = 'inhale';
+            
+            const breathCycle = () => {
+                // Inhale phase (4 seconds)
+                currentPhase = 'inhale';
+                breathText.textContent = languageData[currentLang].inhale;
+                breathGuide.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    // Hold phase (4 seconds)
+                    currentPhase = 'hold';
+                    breathText.textContent = languageData[currentLang].hold;
+                }, 4000);
+                
+                setTimeout(() => {
+                    // Exhale phase (6 seconds)
+                    currentPhase = 'exhale';
+                    breathText.textContent = languageData[currentLang].exhale;
+                    breathGuide.style.transform = 'scale(0.8)';
+                }, 6000);
+            };
+            
+            // Start immediately
+            breathCycle();
+            
+            // Repeat every 10 seconds (4s inhale + 4s hold + 6s exhale)
+            breathCycleTimeout = setInterval(breathCycle, 12000);
+        }
+
+        function startChallenge(duration) {
+            stopPreviewBreathAnimation();
+            
             totalSeconds = duration;
             initialDuration = duration;
             
             // UI 업데이트
-            challengeButtons.style.display = 'none';
-            initialUI.style.display = 'none';
-            h1.textContent = "숨, 쉼";
+            readyContainer.style.display = 'none';
             timerContainer.style.display = 'block';
             resetButton.style.display = 'none';
-            messageDisplay.textContent = '숨을 깊게 들이마시고, 천천히 내쉬세요.';
+            messageDisplay.textContent = languageData[currentLang].messageInitial;
 
-            // 사운드 재생
-            console.log('natureSound element:', natureSound);
-            const randomIndex = Math.floor(Math.random() * natureSounds.length);
-            natureSound.src = natureSounds[randomIndex];
-            console.log('natureSound.src set to:', natureSound.src);
-            natureSound.currentTime = 0;
-            natureSound.play()
-                .then(() => {
-                    console.log('Sound played successfully!');
-                })
-                .catch(error => {
-                    console.error('Error playing sound in startChallenge:', error);
-                    // Removed alert as audio context should be unlocked by now
-                });
+            // Start breath guide with fresh animation
+            breathGuide.style.display = 'flex';
+            startBreathGuideAnimation();
 
             updateTimerDisplay();
 
@@ -324,25 +457,29 @@
 
         function finishChallenge() {
             clearInterval(timer);
-            messageDisplay.textContent = '명상을 완료했습니다. 편안한 하루 보내세요.';
+            clearInterval(breathCycleTimeout);
+            breathGuide.style.display = 'none';
+            messageDisplay.textContent = languageData[currentLang].messageFinish;
             resetButton.style.display = 'block';
-            natureSound.pause();
         }
 
         function resetChallenge() {
             clearInterval(timer);
+            clearInterval(breathCycleTimeout);
             
             // UI 초기화
-            h1.textContent = "명상 챌린지";
+            h1.textContent = languageData[currentLang].h1;
+            document.querySelector('h1').style.display = 'block';
             challengeButtons.style.display = 'block';
             initialUI.style.display = 'block';
+            readyContainer.style.display = 'none';
             timerContainer.style.display = 'none';
             resetButton.style.display = 'none';
             messageDisplay.textContent = '';
             progressBar.style.width = '0%';
-            
-            natureSound.pause();
-            natureSound.currentTime = 0;
+            breathGuide.style.display = 'none';
+            breathGuide.style.transform = 'scale(1)';
+            breathText.textContent = '';
         }
     </script>
 </body>
