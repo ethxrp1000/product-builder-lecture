@@ -556,7 +556,7 @@
             <!-- Ready screen with start button -->
             <div class="ready-container">
                 <div id="breath-guide"><span id="breath-text"></span></div>
-                <p class="ready-message">편안한 자세로 앉아 준비가 되면 시작하세요</p>
+                <p class="ready-message"></p>
                 <button id="start-meditation-button">명상 시작</button>
             </div>
 
@@ -630,7 +630,7 @@
                 h1: '숨, 쉼 - 명상 챌린지',
                 initialP: '잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간',
                 challengeButtons: ['1분', '2분', '3분'],
-                readyMessage: '편안한 자세로 앉아 준비가 되면 시작하세요',
+                readyMessage: '',
                 breathingPatternText: '4:4:6 호흡',
                 startButton: '명상 시작',
                 messageInitial: '숨을 깊게 들이마시고, 천천히 내쉬세요.',
@@ -651,7 +651,7 @@
                 h1: 'Breathe, Pause - Meditation Challenge',
                 initialP: 'Forget everything for a moment, and focus entirely on your breath.',
                 challengeButtons: ['1 min', '2 min', '3 min'],
-                readyMessage: 'Sit in a comfortable position and start when you are ready.',
+                readyMessage: '',
                 breathingPatternText: '4:4:6 Breathing',
                 startButton: 'Start Meditation',
                 messageInitial: 'Breathe in deeply, and exhale slowly.',
@@ -697,7 +697,7 @@
             document.querySelector('.ready-message').textContent = texts.readyMessage;
 
             // 감정 입력 모달 텍스트 업데이트
-            emotionPromptElement.innerHTML = texts.emotionPrompt; // br 태그를 위해 innerHTML 사용
+            emotionPromptElement.innerHTML = ''; // 질문 문구 제거
             emotionWordInput.placeholder = texts.emotionInputPlaceholder;
             saveEmotionButton.textContent = texts.saveButtonText;
             emotionSavedMessageElement.textContent = texts.savedMessage;
