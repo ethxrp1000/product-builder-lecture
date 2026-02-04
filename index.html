@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PVYKGJS6WM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-PVYKGJS6WM');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>숨, 쉼 - 명상 챌린지</title>
@@ -242,6 +251,7 @@
         });
 
         function startChallenge(duration, activeButton) {
+            console.log('startChallenge called with duration:', duration);
             totalSeconds = duration;
             initialDuration = duration;
             
@@ -254,10 +264,19 @@
             messageDisplay.textContent = '숨을 깊게 들이마시고, 천천히 내쉬세요.';
 
             // 사운드 재생
+            console.log('natureSound element:', natureSound);
             const randomIndex = Math.floor(Math.random() * natureSounds.length);
             natureSound.src = natureSounds[randomIndex];
+            console.log('natureSound.src set to:', natureSound.src);
             natureSound.currentTime = 0;
-            natureSound.play();
+            natureSound.play()
+                .then(() => {
+                    console.log('Sound played successfully!');
+                })
+                .catch(error => {
+                    console.error('Error playing sound:', error);
+                    alert('사운드 재생에 실패했습니다. 브라우저 정책으로 인해 자동 재생이 차단되었을 수 있습니다. 화면을 한 번 터치한 후 다시 시도해주세요.');
+                });
 
             updateTimerDisplay();
 
