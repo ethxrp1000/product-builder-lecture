@@ -1,781 +1,307 @@
 <!DOCTYPE html>
-<html lang="ko" style="width: 1280px;"> <head>
+<html lang="ko">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=0.1, user-scalable=yes">
-    <title>ONZSOAP - Client Detail (ROM Measure)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숨, 쉼 - 명상 챌린지</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;900&display=swap');
-        html { -webkit-text-size-adjust: none; text-size-adjust: none; }
-        body { 
-            font-family: 'Pretendard', sans-serif; 
-            letter-spacing: -0.02em; 
-            width: 1280px; margin: 0 auto;
-            background: #F8F9FA;
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #F0F2F0;
+            --primary-color: #5D6D7E;
+            --secondary-color: #A3B18A;
+            --text-color: #34495E;
+            --highlight-color: #588157;
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .tab-line { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .animate-pulse-red { animation: pulse-red 1.5s infinite; }
-        
-        /* 카메라 모달 최적화 */
-        #cam-modal canvas {
-            max-width: 100%;
-            height: auto;
-            image-rendering: optimizeSpeed;
-            image-rendering: -webkit-optimize-contrast;
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
         }
-        
-        /* 측정 가이드 스타일 */
-        .measurement-guide {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-bottom: 12px;
+
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
         }
-        
-        .joint-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 12px 0;
+
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 90%;
+            transition: all 0.5s ease;
         }
-        
-        .joint-btn {
-            padding: 10px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            background: white;
-            font-weight: 600;
-            font-size: 13px;
+
+        h1 {
+            font-weight: 500;
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .challenge-buttons button {
+            background-color: transparent;
+            border: 2px solid var(--secondary-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            margin: 0 8px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.3s ease;
         }
-        
-        .joint-btn.active {
-            background: #3B82F6;
+
+        .challenge-buttons button:hover, .challenge-buttons button.active {
+            background-color: var(--secondary-color);
             color: white;
-            border-color: #3B82F6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
+
+        .timer-container {
+            margin-top: 30px;
+            display: none;
         }
-        
-        .status-good { background: #10b981; }
-        .status-warning { background: #f59e0b; }
-        .status-error { background: #ef4444; }
+
+        #timer {
+            font-size: 64px;
+            font-weight: 300;
+            color: var(--highlight-color);
+            margin-bottom: 20px;
+        }
+
+        #message {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--primary-color);
+            min-height: 27px;
+        }
+
+        #reset-button {
+            display: none;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin-top: 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #reset-button:hover {
+            background-color: #4A5A6A;
+        }
+
+        #progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+            transition: width 1s linear;
+        }
+
+        #fullscreen-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
     </style>
 </head>
-<body class="bg-[#F8F9FA]">
+<body>
 
-    <div id="root-container" style="width: 1280px; display: flex; min-height: 100vh;">
-        <aside class="w-64 bg-white border-r border-gray-100 flex flex-col p-6 shrink-0">
-            <div class="mb-10 text-[#3B82F6] font-black text-2xl tracking-tighter">ONZSOAP</div>
-            <nav class="space-y-1">
-                <button class="w-full text-left py-3 px-4 rounded-xl bg-[#111] text-white font-bold text-[14px]">주관적 기록</button>
-                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">객관적 기록</button>
-                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">상세 기록</button>
-                <button class="w-full text-left py-3 px-4 rounded-xl text-gray-400 font-bold text-[14px] hover:bg-gray-50 transition">결과 보고서</button>
-            </nav>
-        </aside>
-
-        <main style="width: 1024px;" class="flex flex-col shrink-0 min-w-0">
-            <header class="h-14 bg-white border-b border-gray-50 flex items-center px-8 justify-between">
-                <nav class="flex items-center space-x-8 text-[14px] font-bold text-gray-400">
-                    <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800"><span>🏠 Home</span></div>
-                    <div class="flex items-center space-x-2 text-[#3B82F6] cursor-pointer"><span>👥 Client</span></div>
-                    <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800"><span>💬 Community</span></div>
-                </nav>
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[#3B82F6] font-bold text-xs">유</div>
-                    <span class="text-sm font-bold text-gray-700">유오운</span>
-                </div>
-            </header>
-
-            <div class="h-12 flex items-center px-8 justify-between shrink-0 mt-4">
-                <div class="flex items-center text-gray-500 text-[14px] font-bold cursor-pointer hover:text-gray-800">
-                    <span class="mr-2 text-lg">←</span> Client Detail
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center text-[12px] font-bold text-green-500 px-3 py-1">
-                        <span class="mr-2 italic">✔</span> <span id="save-status">마지막 저장: 방금 전</span>
-                    </div>
-                    <button id="save-btn" class="bg-[#111] text-white text-[13px] font-bold px-5 py-2 rounded-xl hover:bg-gray-800 shadow-md transition">기록 저장하기</button>
-                </div>
+    <div class="app-container">
+        <div class="container">
+            <button id="fullscreen-button">⛶</button>
+            <h1>명상 챌린지</h1>
+            <p>잠시 모든 것을 잊고, 온전히 숨에 집중하는 시간</p>
+            <div class="challenge-buttons">
+                <button data-duration="60">1분</button>
+                <button data-duration="120">2분</button>
+                <button data-duration="180">3분</button>
+                <button data-duration="300">5분</button>
             </div>
-
-            <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
-                <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 p-10 w-[976px] mx-auto">
-                    <div class="flex items-center border-b border-gray-100 mb-8 relative" id="tab-container">
-                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] outline-none">1. 주증상 / 발생기전</button>
-                        <button class="tab-item mr-10 pb-4 text-black font-bold text-[15px] outline-none">2. 통증</button>
-                        <button class="tab-item mr-10 pb-4 text-gray-300 font-bold text-[15px] outline-none">3. 과거력 / 사회력</button>
-                        <button class="tab-item pb-4 text-gray-300 font-bold text-[15px] outline-none">4. 가족력 / 환자목표</button>
-                        <div class="tab-line absolute bottom-0 left-0 h-[2.5px] bg-[#333]"></div>
-                    </div>
-
-                    <div class="flex space-x-16">
-                        <div class="flex-1 space-y-10">
-                            <div class="grid grid-cols-3 gap-8">
-                                <div>
-                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">통증부위</label>
-                                    <input type="text" placeholder="통증부위 입력" class="w-full border-b border-gray-200 py-2 text-[14px] outline-none focus:border-blue-400 transition">
-                                </div>
-                                <div>
-                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">통증강도</label>
-                                    <div class="border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
-                                        강도 <span class="text-[8px]">▼</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-[13px] font-bold text-gray-800 mb-3">1일 통증 지속률(%)</label>
-                                    <div class="border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] text-gray-400 flex justify-between items-center cursor-pointer">
-                                        지속률 <span class="text-[8px]">▼</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <label class="text-[13px] font-bold text-gray-800">기타 임상 소견</label>
-                                    <div class="flex items-center space-x-3">
-                                        <span id="stt-status" class="text-[10px] font-bold text-red-500 hidden animate-pulse-red">● REC</span>
-                                        <button id="mic-btn" class="text-gray-400 cursor-pointer hover:text-[#3B82F6] transition-colors p-1" title="음성 인식 시작">
-                                            <span class="text-lg">🎙️</span>
-                                        </button>
-                                        <button id="cam-btn" class="text-gray-400 cursor-pointer hover:text-green-500 transition-colors p-1" title="카메라 측정 시작">
-                                            <span class="text-lg">📷</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <textarea id="memo-textarea" placeholder="측정 결과 및 임상 소견이 여기에 입력됩니다." class="w-full h-32 bg-gray-50/50 border border-gray-100 rounded-2xl p-5 text-[14px] outline-none focus:border-blue-200 transition resize-none"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="w-[340px] shrink-0">
-                            <div id="body-chart-container" class="w-full h-[480px] border border-gray-100 rounded-2xl bg-[#FCFDFF] relative flex items-center justify-center overflow-hidden shadow-inner cursor-crosshair">
-                                <div class="text-center z-10 pointer-events-none select-none">
-                                    <div class="text-gray-200 text-6xl mb-4">👤</div>
-                                    <p class="text-gray-300 font-bold text-sm tracking-widest uppercase">Body Chart</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> 
+            <div class="timer-container">
+                <div id="timer">00:00</div>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
                 </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- 카메라 측정 모달 (개선됨) -->
-    <div id="cam-modal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-10">
-        <div class="bg-white rounded-[32px] w-full max-w-4xl overflow-hidden relative shadow-2xl">
-            <div class="p-6 border-b flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold text-lg">실시간 가동범위(ROM) 측정</h3>
-                    <div class="flex items-center mt-2 text-xs">
-                        <span class="status-indicator" id="detection-status"></span>
-                        <span id="detection-text" class="text-gray-500">카메라 준비 중...</span>
-                    </div>
-                </div>
-                <button id="close-cam" class="text-gray-400 hover:text-black text-2xl">×</button>
-            </div>
-            
-            <!-- 측정 가이드 -->
-            <div class="measurement-guide mx-6 mt-4">
-                <div class="font-bold mb-1">📋 측정 가이드</div>
-                <div id="guide-text" class="text-xs opacity-90">
-                    측정할 관절을 선택하고, 카메라 앞에서 천천히 움직여주세요.
-                </div>
-            </div>
-            
-            <!-- 관절 선택 -->
-            <div class="px-6">
-                <label class="block text-sm font-bold mb-2">측정 관절 선택</label>
-                <div class="joint-selector">
-                    <button class="joint-btn active" data-joint="elbow-right">우측 팔꿈치</button>
-                    <button class="joint-btn" data-joint="elbow-left">좌측 팔꿈치</button>
-                    <button class="joint-btn" data-joint="shoulder-right">우측 어깨</button>
-                    <button class="joint-btn" data-joint="shoulder-left">좌측 어깨</button>
-                    <button class="joint-btn" data-joint="knee-right">우측 무릎</button>
-                    <button class="joint-btn" data-joint="knee-left">좌측 무릎</button>
-                    <button class="joint-btn" data-joint="hip-right">우측 고관절</button>
-                    <button class="joint-btn" data-joint="hip-left">좌측 고관절</button>
-                </div>
-            </div>
-            
-            <div class="relative bg-black flex justify-center">
-                <video id="input_video" class="hidden"></video>
-                <canvas id="output_canvas" width="640" height="480" class="w-full h-auto"></canvas>
-                
-                <!-- 측정 데이터 표시 (개선됨) -->
-                <div class="absolute top-5 right-5 bg-black/70 text-white p-4 rounded-2xl backdrop-blur-md min-w-[160px]">
-                    <p class="text-[10px] text-gray-300 uppercase font-bold mb-1">현재 각도</p>
-                    <p class="text-4xl font-black text-green-400" id="current-angle">--°</p>
-                    
-                    <div class="border-t border-gray-600 my-3"></div>
-                    
-                    <p class="text-[10px] text-gray-300 uppercase font-bold mb-1">최대 각도</p>
-                    <p class="text-2xl font-black text-blue-400" id="max-angle">--°</p>
-                    
-                    <div class="border-t border-gray-600 my-3"></div>
-                    
-                    <p class="text-[10px] text-gray-300 uppercase font-bold mb-1">측정 시간</p>
-                    <p class="text-sm font-bold text-yellow-400" id="measure-time">00:00</p>
-                </div>
-                
-                <!-- FPS 표시 (디버깅용) -->
-                <div class="absolute top-5 left-5 bg-black/50 text-white px-3 py-2 rounded-lg text-xs font-mono">
-                    FPS: <span id="fps-display">0</span>
-                </div>
-            </div>
-            
-            <div class="p-6 bg-gray-50 flex justify-between items-center">
-                <div class="text-xs text-gray-600">
-                    <span class="font-bold">💡 Tip:</span> 측정 중 움직임을 천천히 하면 더 정확합니다
-                </div>
-                <div class="flex space-x-3">
-                    <button id="reset-max" class="px-6 py-2 bg-white border rounded-xl font-bold text-sm hover:bg-gray-100 transition">초기화</button>
-                    <button id="apply-rom" class="px-6 py-2 bg-[#111] text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition shadow-lg">결과 반영</button>
-                </div>
+                <p id="message"></p>
+                <button id="reset-button">다시하기</button>
             </div>
         </div>
     </div>
 
+    <audio id="nature-sound" loop src="https://cdn.pixabay.com/audio/2022/10/18/audio_83a15dc289.mp3"></audio>
+
     <script>
-        // ========================================
-        // 1. 기본 UI 로직
-        // ========================================
-        const tabs = document.querySelectorAll('.tab-item');
-        const tabLine = document.querySelector('.tab-line');
-        
-        function moveLine(element) {
-            const rect = element.getBoundingClientRect();
-            const containerRect = document.getElementById('tab-container').getBoundingClientRect();
-            tabLine.style.width = `${rect.width}px`;
-            tabLine.style.left = `${rect.left - containerRect.left}px`;
-        }
-        
-        tabs.forEach((tab) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => { 
-                    t.classList.remove('text-black'); 
-                    t.classList.add('text-gray-300'); 
-                });
-                tab.classList.add('text-black'); 
-                tab.classList.remove('text-gray-300');
-                moveLine(tab);
-            });
+        const challengeButtons = document.querySelector('.challenge-buttons');
+        const timerContainer = document.querySelector('.timer-container');
+        const timerDisplay = document.getElementById('timer');
+        const messageDisplay = document.getElementById('message');
+        const resetButton = document.getElementById('reset-button');
+        const natureSound = document.getElementById('nature-sound');
+        const initialUI = document.querySelector('.container p');
+        const h1 = document.querySelector('h1');
+        const progressBar = document.getElementById('progress-bar');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+
+        const natureSounds = [
+            "https://assets.mixkit.co/sfx/preview/mixkit-forest-at-night-1233.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-summer-night-crickets-and-wind-1229.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-jungle-atmosphere-with-insects-and-birds-2413.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-light-rain-and-crickets-1240.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-rain-and-thunder-in-the-forest-1254.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-calm-river-in-the-jungle-1252.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-waterfall-in-a-cave-1223.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-waves-coming-to-the-shore-1260.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-gentle-ocean-waves-1129.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-wind-in-the-trees-1174.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-strong-wind-whistle-1205.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-birds-singing-in-the-forest-1234.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-singing-birds-in-the-morning-1232.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-owl-hooting-in-the-forest-2480.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-wolf-howling-in-the-night-1219.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-crickets-chirping-in-the-night-1243.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-cicadas-in-a-field-2407.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-frogs-croaking-in-a-pond-1231.mp3",
+            "https://assets.mixkit.co/sfx/preview/mixkit-bees-buzzing-in-a-meadow-2482.mp3"
+        ];
+
+        const backgroundImages = [
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop", // Sunday
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop", // Monday
+            "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2070&auto=format&fit=crop", // Tuesday
+            "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=2070&auto=format&fit=crop", // Wednesday
+            "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2175&auto=format&fit=crop", // Thursday
+            "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1974&auto=format&fit=crop", // Friday
+            "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=2070&auto=format&fit=crop"  // Saturday
+        ];
+
+        let timer;
+        let totalSeconds = 0;
+        let initialDuration = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dayOfWeek = new Date().getDay();
+            document.body.style.backgroundImage = `url('${backgroundImages[dayOfWeek]}')`;
         });
-        
-        window.onload = () => { moveLine(tabs[1]); };
 
-        // ========================================
-        // 2. ROM 측정 시스템 (최적화 및 개선)
-        // ========================================
-        
-        // DOM 요소
-        const camBtn = document.getElementById('cam-btn');
-        const camModal = document.getElementById('cam-modal');
-        const closeCam = document.getElementById('close-cam');
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const angleDisplay = document.getElementById('current-angle');
-        const maxAngleDisplay = document.getElementById('max-angle');
-        const memoTextarea = document.getElementById('memo-textarea');
-        const detectionStatus = document.getElementById('detection-status');
-        const detectionText = document.getElementById('detection-text');
-        const guideText = document.getElementById('guide-text');
-        const measureTimeDisplay = document.getElementById('measure-time');
-        const fpsDisplay = document.getElementById('fps-display');
-        
-        // 측정 상태 변수
-        let maxROM = 0;
-        let currentJoint = 'elbow-right';
-        let measureStartTime = null;
-        let isDetecting = false;
-        let camera = null;
-        let pose = null;
-        
-        // FPS 계산
-        let lastFrameTime = Date.now();
-        let frameCount = 0;
-        let fps = 0;
-        
-        // 관절별 측정 설정
-        const jointConfigs = {
-            'elbow-right': {
-                name: '우측 팔꿈치',
-                landmarks: [11, 13, 15], // 어깨-팔꿈치-손목
-                guide: '팔을 펴고 구부리는 동작을 천천히 반복해주세요. 팔꿈치가 화면에 잘 보이도록 해주세요.',
-                minAngle: 30,
-                normalRange: [0, 150]
-            },
-            'elbow-left': {
-                name: '좌측 팔꿈치',
-                landmarks: [12, 14, 16],
-                guide: '팔을 펴고 구부리는 동작을 천천히 반복해주세요. 팔꿈치가 화면에 잘 보이도록 해주세요.',
-                minAngle: 30,
-                normalRange: [0, 150]
-            },
-            'shoulder-right': {
-                name: '우측 어깨',
-                landmarks: [11, 13, 23], // 어깨-팔꿈치-엉덩이
-                guide: '팔을 옆으로 천천히 들어올렸다 내리는 동작을 반복해주세요.',
-                minAngle: 20,
-                normalRange: [0, 180]
-            },
-            'shoulder-left': {
-                name: '좌측 어깨',
-                landmarks: [12, 14, 24],
-                guide: '팔을 옆으로 천천히 들어올렸다 내리는 동작을 반복해주세요.',
-                minAngle: 20,
-                normalRange: [0, 180]
-            },
-            'knee-right': {
-                name: '우측 무릎',
-                landmarks: [23, 25, 27], // 엉덩이-무릎-발목
-                guide: '다리를 천천히 구부렸다 펴는 동작을 반복해주세요. 옆모습이 잘 보이도록 서주세요.',
-                minAngle: 30,
-                normalRange: [0, 140]
-            },
-            'knee-left': {
-                name: '좌측 무릎',
-                landmarks: [24, 26, 28],
-                guide: '다리를 천천히 구부렸다 펴는 동작을 반복해주세요. 옆모습이 잘 보이도록 서주세요.',
-                minAngle: 30,
-                normalRange: [0, 140]
-            },
-            'hip-right': {
-                name: '우측 고관절',
-                landmarks: [11, 23, 25], // 어깨-엉덩이-무릎
-                guide: '다리를 앞으로 천천히 들어올렸다 내리는 동작을 반복해주세요.',
-                minAngle: 20,
-                normalRange: [0, 120]
-            },
-            'hip-left': {
-                name: '좌측 고관절',
-                landmarks: [12, 24, 26],
-                guide: '다리를 앞으로 천천히 들어올렸다 내리는 동작을 반복해주세요.',
-                minAngle: 20,
-                normalRange: [0, 120]
+        challengeButtons.addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON') {
+                const duration = parseInt(e.target.dataset.duration, 10);
+                startChallenge(duration, e.target);
             }
-        };
-        
-        // 각도 계산 함수 (개선됨)
-        function calculateAngle(a, b, c) {
-            if (!a || !b || !c) return 0;
-            
-            const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
-            let angle = Math.abs((radians * 180.0) / Math.PI);
-            
-            if (angle > 180.0) {
-                angle = 360 - angle;
-            }
-            
-            return angle;
-        }
-        
-        // 랜드마크 신뢰도 검증
-        function isValidLandmark(landmark, minVisibility = 0.6) {
-            return landmark && landmark.visibility > minVisibility;
-        }
-        
-        // 측정 상태 업데이트
-        function updateDetectionStatus(status, message) {
-            detectionStatus.className = 'status-indicator';
-            
-            switch(status) {
-                case 'good':
-                    detectionStatus.classList.add('status-good');
-                    isDetecting = true;
-                    break;
-                case 'warning':
-                    detectionStatus.classList.add('status-warning');
-                    isDetecting = true;
-                    break;
-                case 'error':
-                    detectionStatus.classList.add('status-error');
-                    isDetecting = false;
-                    break;
-            }
-            
-            detectionText.textContent = message;
-        }
-        
-        // 측정 시간 업데이트
-        function updateMeasureTime() {
-            if (!measureStartTime) return;
-            
-            const elapsed = Math.floor((Date.now() - measureStartTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            measureTimeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-        
-        // MediaPipe Pose 초기화 (최적화됨)
-        function initializePose() {
-            pose = new Pose({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-            });
+        });
 
-            // 모바일 최적화 설정
-            pose.setOptions({
-                modelComplexity: 1,              // 0=Lite, 1=Full, 2=Heavy (1로 균형)
-                smoothLandmarks: true,            // 부드러운 추적
-                enableSegmentation: false,        // 세그멘테이션 비활성화 (성능 향상)
-                smoothSegmentation: false,
-                minDetectionConfidence: 0.6,      // 검출 신뢰도 (높일수록 정확하지만 느림)
-                minTrackingConfidence: 0.5        // 추적 신뢰도
-            });
+        resetButton.addEventListener('click', () => {
+            resetChallenge();
+        });
 
-            pose.onResults(onPoseResults);
-        }
-        
-        // Pose 결과 처리 (개선됨)
-        function onPoseResults(results) {
-            // FPS 계산
-            frameCount++;
-            const now = Date.now();
-            if (now - lastFrameTime >= 1000) {
-                fps = frameCount;
-                fpsDisplay.textContent = fps;
-                frameCount = 0;
-                lastFrameTime = now;
-            }
-            
-            // 캔버스 클리어 및 비디오 그리기
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-            
-            // 랜드마크가 없으면 경고
-            if (!results.poseLandmarks) {
-                updateDetectionStatus('error', '사람을 인식할 수 없습니다. 전신이 보이도록 조정해주세요.');
-                angleDisplay.innerText = '--°';
-                canvasCtx.restore();
-                return;
-            }
-            
-            // 전체 스켈레톤 그리기 (연한 색상)
-            drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-                color: '#E5E7EB', 
-                lineWidth: 2
-            });
-            drawLandmarks(canvasCtx, results.poseLandmarks, {
-                color: '#9CA3AF', 
-                lineWidth: 1, 
-                radius: 3,
-                fillColor: '#F3F4F6'
-            });
-            
-            // 선택된 관절 측정
-            const config = jointConfigs[currentJoint];
-            const [idx1, idx2, idx3] = config.landmarks;
-            
-            const point1 = results.poseLandmarks[idx1];
-            const point2 = results.poseLandmarks[idx2];
-            const point3 = results.poseLandmarks[idx3];
-            
-            // 랜드마크 신뢰도 검증
-            if (!isValidLandmark(point1) || !isValidLandmark(point2) || !isValidLandmark(point3)) {
-                updateDetectionStatus('warning', '관절이 명확하게 보이지 않습니다. 자세를 조정해주세요.');
-                angleDisplay.innerText = '--°';
-                canvasCtx.restore();
-                return;
-            }
-            
-            // 측정 관절 강조 표시
-            const highlightPoints = [point1, point2, point3];
-            
-            // 연결선 강조
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(point1.x * canvasElement.width, point1.y * canvasElement.height);
-            canvasCtx.lineTo(point2.x * canvasElement.width, point2.y * canvasElement.height);
-            canvasCtx.lineTo(point3.x * canvasElement.width, point3.y * canvasElement.height);
-            canvasCtx.strokeStyle = '#3B82F6';
-            canvasCtx.lineWidth = 4;
-            canvasCtx.stroke();
-            
-            // 포인트 강조
-            highlightPoints.forEach((point, index) => {
-                const x = point.x * canvasElement.width;
-                const y = point.y * canvasElement.height;
-                
-                canvasCtx.beginPath();
-                canvasCtx.arc(x, y, 8, 0, 2 * Math.PI);
-                canvasCtx.fillStyle = index === 1 ? '#EF4444' : '#3B82F6'; // 중간 관절은 빨간색
-                canvasCtx.fill();
-                canvasCtx.strokeStyle = 'white';
-                canvasCtx.lineWidth = 2;
-                canvasCtx.stroke();
-            });
-            
-            // 각도 계산
-            const angle = calculateAngle(point1, point2, point3);
-            const displayAngle = Math.round(angle);
-            
-            // 유효한 각도인지 확인
-            if (displayAngle < config.minAngle) {
-                updateDetectionStatus('warning', '측정 범위가 너무 작습니다. 더 크게 움직여주세요.');
+        fullscreenButton.addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
             } else {
-                updateDetectionStatus('good', '측정 중... 정상 작동');
+                document.documentElement.requestFullscreen();
             }
-            
-            // 각도 표시
-            angleDisplay.innerText = `${displayAngle}°`;
-            
-            // 최대값 업데이트
-            if (displayAngle >= config.minAngle && displayAngle > maxROM) {
-                maxROM = displayAngle;
-                maxAngleDisplay.innerText = `${maxROM}°`;
-                
-                // 최대값 갱신 시 시각적 피드백
-                maxAngleDisplay.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    maxAngleDisplay.style.transform = 'scale(1)';
-                }, 200);
-            }
-            
-            // 각도 텍스트를 관절 옆에 표시
-            const jointX = point2.x * canvasElement.width;
-            const jointY = point2.y * canvasElement.height;
-            
-            canvasCtx.font = 'bold 24px Pretendard';
-            canvasCtx.fillStyle = '#FFFFFF';
-            canvasCtx.strokeStyle = '#000000';
-            canvasCtx.lineWidth = 4;
-            canvasCtx.strokeText(`${displayAngle}°`, jointX + 15, jointY - 15);
-            canvasCtx.fillText(`${displayAngle}°`, jointX + 15, jointY - 15);
-            
-            canvasCtx.restore();
-            
-            // 측정 시간 업데이트
-            updateMeasureTime();
-        }
-        
-        // 카메라 초기화 (개선됨)
-        function initializeCamera() {
-            // 기존 카메라가 있으면 정리
-            if (camera) {
-                camera.stop();
-            }
-            
-            camera = new Camera(videoElement, {
-                onFrame: async () => {
-                    if (pose) {
-                        await pose.send({image: videoElement});
-                    }
-                },
-                width: 640,   // 해상도 최적화 (너무 높으면 느려짐)
-                height: 480,
-                facingMode: 'environment' // 후면 카메라 우선
-            });
-        }
-        
-        // 관절 선택 버튼
-        const jointBtns = document.querySelectorAll('.joint-btn');
-        jointBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                jointBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentJoint = btn.dataset.joint;
-                
-                // 최대값 초기화
-                maxROM = 0;
-                maxAngleDisplay.innerText = '--°';
-                
-                // 가이드 텍스트 업데이트
-                guideText.textContent = jointConfigs[currentJoint].guide;
-            });
-        });
-        
-        // 카메라 시작
-        camBtn.addEventListener('click', async () => {
-            camModal.classList.remove('hidden');
-            
-            // 초기화
-            maxROM = 0;
-            maxAngleDisplay.innerText = '--°';
-            angleDisplay.innerText = '--°';
-            measureStartTime = Date.now();
-            
-            // 가이드 텍스트 설정
-            guideText.textContent = jointConfigs[currentJoint].guide;
-            
-            // Pose 초기화 (처음 한 번만)
-            if (!pose) {
-                initializePose();
-            }
-            
-            // 카메라 초기화 및 시작
-            initializeCamera();
-            
-            try {
-                updateDetectionStatus('warning', '카메라 시작 중...');
-                await camera.start();
-                updateDetectionStatus('good', '측정 준비 완료');
-                
-                // 측정 시간 업데이트 시작
-                const timeInterval = setInterval(() => {
-                    if (camModal.classList.contains('hidden')) {
-                        clearInterval(timeInterval);
-                    } else {
-                        updateMeasureTime();
-                    }
-                }, 1000);
-                
-            } catch (err) {
-                console.error('Camera error:', err);
-                updateDetectionStatus('error', '카메라 접근 실패. 권한을 확인해주세요.');
-                alert('카메라 접근에 실패했습니다.\n\n1. HTTPS 환경에서 실행 중인지 확인\n2. 카메라 권한이 허용되었는지 확인\n3. 다른 앱에서 카메라를 사용 중이지 않는지 확인');
-            }
-        });
-        
-        // 카메라 종료
-        closeCam.addEventListener('click', () => {
-            camModal.classList.add('hidden');
-            if (camera) {
-                camera.stop();
-            }
-            measureStartTime = null;
-        });
-        
-        // 초기화 버튼
-        document.getElementById('reset-max').addEventListener('click', () => {
-            maxROM = 0;
-            maxAngleDisplay.innerText = '--°';
-            measureStartTime = Date.now();
-        });
-        
-        // 결과 반영 버튼 (개선됨)
-        document.getElementById('apply-rom').addEventListener('click', () => {
-            const config = jointConfigs[currentJoint];
-            const timestamp = new Date().toLocaleString('ko-KR', {
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            // 측정 시간 계산
-            const measureDuration = Math.floor((Date.now() - measureStartTime) / 1000);
-            const minutes = Math.floor(measureDuration / 60);
-            const seconds = measureDuration % 60;
-            const durationText = minutes > 0 ? `${minutes}분 ${seconds}초` : `${seconds}초`;
-            
-            // 정상 범위와 비교
-            const [minNormal, maxNormal] = config.normalRange;
-            let interpretation = '';
-            
-            if (maxROM < minNormal + 20) {
-                interpretation = ' (제한적)';
-            } else if (maxROM >= maxNormal - 10) {
-                interpretation = ' (정상)';
-            } else {
-                interpretation = ' (양호)';
-            }
-            
-            // 기록 추가
-            const record = `[ROM 측정 - ${timestamp}]\n부위: ${config.name}\n최대 가동범위: ${maxROM}°${interpretation}\n측정 시간: ${durationText}\n정상 범위: ${minNormal}-${maxNormal}°\n`;
-            
-            memoTextarea.value += (memoTextarea.value ? '\n' : '') + record;
-            
-            // 모달 닫기
-            camModal.classList.add('hidden');
-            if (camera) {
-                camera.stop();
-            }
-            
-            // 성공 피드백
-            alert(`${config.name} 측정 결과가 기록되었습니다.\n최대 ROM: ${maxROM}°`);
         });
 
-        // ========================================
-        // 3. 음성 인식 (STT)
-        // ========================================
-        const micBtn = document.getElementById('mic-btn');
-        const sttStatus = document.getElementById('stt-status');
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        function startChallenge(duration, activeButton) {
+            totalSeconds = duration;
+            initialDuration = duration;
+            
+            // UI 업데이트
+            challengeButtons.style.display = 'none';
+            initialUI.style.display = 'none';
+            h1.textContent = "숨, 쉼";
+            timerContainer.style.display = 'block';
+            resetButton.style.display = 'none';
+            messageDisplay.textContent = '숨을 깊게 들이마시고, 천천히 내쉬세요.';
 
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.lang = 'ko-KR';
-            recognition.interimResults = false;
-            
-            let isRecording = false;
-            
-            micBtn.addEventListener('click', () => {
-                if (isRecording) {
-                    recognition.stop();
+            // 사운드 재생
+            const randomIndex = Math.floor(Math.random() * natureSounds.length);
+            natureSound.src = natureSounds[randomIndex];
+            natureSound.currentTime = 0;
+            natureSound.play();
+
+            updateTimerDisplay();
+
+            timer = setInterval(() => {
+                totalSeconds--;
+                if (totalSeconds < 0) {
+                    finishChallenge();
                 } else {
-                    recognition.start();
+                    updateTimerDisplay();
                 }
-            });
-            
-            recognition.onstart = () => {
-                isRecording = true;
-                sttStatus.classList.remove('hidden');
-                micBtn.classList.add('text-red-500');
-            };
-            
-            recognition.onend = () => {
-                isRecording = false;
-                sttStatus.classList.add('hidden');
-                micBtn.classList.remove('text-red-500');
-            };
-            
-            recognition.onresult = (event) => {
-                const transcript = event.results[event.results.length - 1][0].transcript;
-                memoTextarea.value += (memoTextarea.value ? ' ' : '') + transcript;
-            };
-            
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                isRecording = false;
-                sttStatus.classList.add('hidden');
-                micBtn.classList.remove('text-red-500');
-            };
-        } else {
-            micBtn.style.display = 'none';
-            console.warn('음성 인식이 이 브라우저에서 지원되지 않습니다.');
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+
+            const progressPercentage = ((initialDuration - totalSeconds) / initialDuration) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
         }
 
-        // ========================================
-        // 4. 저장 기능
-        // ========================================
-        document.getElementById('save-btn').addEventListener('click', () => {
-            const saveStatus = document.getElementById('save-status');
-            saveStatus.textContent = '저장 중...';
+        function finishChallenge() {
+            clearInterval(timer);
+            messageDisplay.textContent = '명상을 완료했습니다. 편안한 하루 보내세요.';
+            resetButton.style.display = 'block';
+            natureSound.pause();
+        }
+
+        function resetChallenge() {
+            clearInterval(timer);
             
-            // 실제로는 서버로 데이터 전송
-            setTimeout(() => {
-                saveStatus.textContent = '마지막 저장: 방금 전';
-                alert('기록이 성공적으로 저장되었습니다.');
-            }, 500);
-        });
-        
-        // ========================================
-        // 5. 페이지 이탈 방지
-        // ========================================
-        window.addEventListener('beforeunload', (e) => {
-            if (memoTextarea.value.trim() !== '') {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
+            // UI 초기화
+            h1.textContent = "명상 챌린지";
+            challengeButtons.style.display = 'block';
+            initialUI.style.display = 'block';
+            timerContainer.style.display = 'none';
+            resetButton.style.display = 'none';
+            messageDisplay.textContent = '';
+            progressBar.style.width = '0%';
+            
+            natureSound.pause();
+            natureSound.currentTime = 0;
+        }
     </script>
 </body>
 </html>
